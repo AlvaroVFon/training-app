@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
@@ -65,7 +66,10 @@ export class ExercisesController {
     description: 'Forbidden (No access to this exercise)',
   })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  findOne(@Param('id') id: string, @GetUser('id') userId: string) {
+  findOne(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @GetUser('id') userId: string,
+  ) {
     return this.exercisesService.findOne(id, userId);
   }
 
@@ -80,7 +84,7 @@ export class ExercisesController {
   })
   @ApiResponse({ status: 404, description: 'Not Found' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateExerciseDto: UpdateExerciseDto,
     @GetUser('id') userId: string,
     @GetUser('roles') roles: Role[],
@@ -98,7 +102,7 @@ export class ExercisesController {
   })
   @ApiResponse({ status: 404, description: 'Not Found' })
   remove(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @GetUser('id') userId: string,
     @GetUser('roles') roles: Role[],
   ) {

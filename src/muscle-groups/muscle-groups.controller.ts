@@ -14,6 +14,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { MuscleGroupsService } from './muscle-groups.service';
 import { CreateMuscleGroupDto } from './dto/create-muscle-group.dto';
 import { UpdateMuscleGroupDto } from './dto/update-muscle-group.dto';
@@ -57,7 +58,7 @@ export class MuscleGroupsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.muscleGroupsService.findOne(id);
   }
 
@@ -69,7 +70,7 @@ export class MuscleGroupsController {
   @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateMuscleGroupDto: UpdateMuscleGroupDto,
   ) {
     return this.muscleGroupsService.update(id, updateMuscleGroupDto);
@@ -81,7 +82,7 @@ export class MuscleGroupsController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.muscleGroupsService.remove(id);
   }
 }
