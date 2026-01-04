@@ -38,6 +38,7 @@ export class UsersRepository {
   async findById(id: string): Promise<User | null> {
     return this.userModel.findById(id).lean().exec() as unknown as User;
   }
+
   async findByEmail(
     email: string,
     includePassword = false,
@@ -48,6 +49,7 @@ export class UsersRepository {
     }
     return query.exec() as unknown as User;
   }
+
   async updateUser(
     id: string,
     updateUserDto: UpdateUserDto,

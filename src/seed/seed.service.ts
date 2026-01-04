@@ -87,15 +87,19 @@ export class SeedService {
 
   async seedWorkouts() {
     this.logger.log('Seeding workouts...');
-    const users = await this.usersService.findAll();
+    const { data: users } = await this.usersService.findAll({
+      page: 1,
+      limit: 10,
+    });
     if (users.length === 0) {
       this.logger.warn('No users found to assign workouts.');
       return;
     }
 
     const targetUser = users[0];
-    const existingWorkouts = await this.workoutsService.findAll(
+    const { data: existingWorkouts } = await this.workoutsService.findAll(
       (targetUser as any)._id.toString(),
+      { page: 1, limit: 10 },
     );
 
     if (existingWorkouts.length > 0) {
@@ -103,8 +107,9 @@ export class SeedService {
       return;
     }
 
-    const exercises = await this.exercisesService.findAll(
+    const { data: exercises } = await this.exercisesService.findAll(
       (targetUser as any)._id.toString(),
+      { page: 1, limit: 100 },
     );
 
     for (const workoutData of SEED_WORKOUTS) {
