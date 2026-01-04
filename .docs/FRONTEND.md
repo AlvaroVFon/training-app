@@ -11,12 +11,13 @@ From there, you can:
 - See request/response schemas (DTOs).
 - Test endpoints directly from the browser.
 
-## Authentication Flow
+## Authentication & Authorization
 
-1. **Login**: Send a POST request to `/auth/login` with `email` and `password`.
+1. **Login/Register**: Send a POST request to `/auth/login` or `/auth/register`.
 2. **Token**: On success, you will receive an `access_token`.
 3. **Authorization**: Include this token in the `Authorization` header for protected requests:
    `Authorization: Bearer <your_token>`
+4. **Roles**: The API uses Role-Based Access Control (RBAC). Some endpoints are restricted to `admin` users.
 
 ## Key Endpoints
 
@@ -27,11 +28,11 @@ From there, you can:
 
 ### Users
 
-- `GET /users`: List all users (Requires Auth).
-- `POST /users`: Create a new user (Public/Admin).
-- `GET /users/:id`: Get user details.
-- `PATCH /users/:id`: Update user details.
-- `DELETE /users/:id`: Remove a user.
+- `GET /users`: List all users (Requires `admin` role).
+- `POST /users`: Create a new user (Public).
+- `GET /users/:id`: Get user details (Requires Auth).
+- `PATCH /users/:id`: Update user details (Requires Auth).
+- `DELETE /users/:id`: Remove a user (Requires `admin` role).
 
 ### Workouts (Coming Soon)
 

@@ -38,6 +38,7 @@ export class AuthService {
   login(user: User & { _id: any }): LoginResponse {
     const payload: TokenPayload = {
       sub: user._id.toString(),
+      roles: user.roles,
       type: 'access',
     };
 

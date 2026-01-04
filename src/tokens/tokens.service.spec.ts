@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TokensService } from './tokens.service';
+import { TokenPayload, TokensService } from './tokens.service';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
+import { Role } from '../auth/enums/role.enum';
 
 describe('TokensService', () => {
   let service: TokensService;
@@ -34,7 +35,12 @@ describe('TokensService', () => {
 
   describe('generateToken', () => {
     it('should generate a valid JWT token with sub', () => {
-      const payload = { sub: '123' };
+      const payload: TokenPayload = {
+        sub: '123',
+        roles: [Role.USER],
+        type: 'access',
+      };
+
       const token = service.generateToken(payload);
 
       expect(token).toBeDefined();
@@ -42,15 +48,22 @@ describe('TokensService', () => {
 
       const decoded = jwt.verify(token, 'testSecret') as any;
       expect(decoded.sub).toBe(payload.sub);
+      expect(decoded.roles).toEqual(payload.roles);
+      expect(decoded.type).toBe(payload.type);
     });
 
     it('should generate a valid JWT token with sub and type', () => {
-      const payload = { sub: '123', type: 'access' };
+      const payload: TokenPayload = {
+        sub: '123',
+        roles: [Role.USER],
+        type: 'access',
+      };
       const token = service.generateToken(payload);
 
       expect(token).toBeDefined();
       const decoded = jwt.verify(token, 'testSecret') as any;
       expect(decoded.sub).toBe(payload.sub);
+      expect(decoded.roles).toEqual(payload.roles);
       expect(decoded.type).toBe(payload.type);
     });
   });

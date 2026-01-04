@@ -18,11 +18,26 @@ describe('UsersRepository', () => {
 
   const mockUserModel = {
     create: jest.fn(),
-    find: jest.fn(),
-    findById: jest.fn(),
-    findOne: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-    findByIdAndDelete: jest.fn(),
+    find: jest.fn().mockReturnValue({
+      exec: jest.fn(),
+    }),
+    findById: jest.fn().mockReturnValue({
+      lean: jest.fn().mockReturnValue({
+        exec: jest.fn(),
+      }),
+    }),
+    findOne: jest.fn().mockReturnValue({
+      lean: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn(),
+      }),
+    }),
+    findByIdAndUpdate: jest.fn().mockReturnValue({
+      exec: jest.fn(),
+    }),
+    findByIdAndDelete: jest.fn().mockReturnValue({
+      exec: jest.fn(),
+    }),
   };
 
   beforeEach(async () => {
@@ -88,7 +103,9 @@ describe('UsersRepository', () => {
   describe('findById', () => {
     it('should return a user if found', async () => {
       mockUserModel.findById.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(mockUser),
+        lean: jest.fn().mockReturnValue({
+          exec: jest.fn().mockResolvedValue(mockUser),
+        }),
       } as any);
 
       const result = await repository.findById('someId');
@@ -98,7 +115,9 @@ describe('UsersRepository', () => {
 
     it('should return null if user not found', async () => {
       mockUserModel.findById.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(null),
+        lean: jest.fn().mockReturnValue({
+          exec: jest.fn().mockResolvedValue(null),
+        }),
       } as any);
 
       const result = await repository.findById('someId');
@@ -109,6 +128,7 @@ describe('UsersRepository', () => {
   describe('findByEmail', () => {
     it('should return a user if found by email', async () => {
       const mockQuery = {
+        lean: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockUser),
       };
       mockUserModel.findOne.mockReturnValue(mockQuery);
@@ -122,6 +142,7 @@ describe('UsersRepository', () => {
 
     it('should include password if includePassword is true', async () => {
       const mockQuery = {
+        lean: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockUser),
       };

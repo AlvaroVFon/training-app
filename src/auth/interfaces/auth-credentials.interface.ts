@@ -1,4 +1,5 @@
 import { User } from '../../users/entities/user.entity';
+import { Role } from '../enums/role.enum';
 
 export interface LocalCredentials {
   email: string;
@@ -7,6 +8,7 @@ export interface LocalCredentials {
 
 export interface JwtPayload {
   sub: string; // userId
+  roles: Role[];
   type?: string;
 }
 

@@ -16,6 +16,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 - **Framework**: NestJS (v11)
 - **Database**: MongoDB (Mongoose ODM)
 - **Authentication**: Passport.js (Local & JWT strategies)
+- **Authorization**: Role-Based Access Control (RBAC) with custom Guards.
 - **AI Integration**: (Planned) Python-based microservice or integrated TensorFlow/ONNX model.
 - **Documentation**: Swagger (OpenAPI)
 

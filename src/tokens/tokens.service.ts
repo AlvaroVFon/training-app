@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
+import { Role } from '../auth/enums/role.enum';
 
 export interface TokenPayload {
   sub: string;
+  roles: Role[];
   type?: string;
   [key: string]: any;
 }

@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { CryptoService } from '../crypto/crypto.service';
 import { TokensService } from '../tokens/tokens.service';
-import { User } from '../users/entities/user.entity';
+import { Role } from './enums/role.enum';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -17,13 +17,7 @@ describe('AuthService', () => {
     password: 'hashedPassword',
     name: 'Test User',
     age: 30,
-    toObject: jest.fn().mockReturnValue({
-      _id: '695ab9a088d65bd0e8294d21',
-      email: 'test@example.com',
-      password: 'hashedPassword',
-      name: 'Test User',
-      age: 30,
-    }),
+    roles: [Role.USER],
   };
 
   const mockUsersService = {
@@ -142,6 +136,7 @@ describe('AuthService', () => {
 
       expect(tokensService.generateToken).toHaveBeenCalledWith({
         sub: mockUser._id.toString(),
+        roles: mockUser.roles,
         type: 'access',
       });
       expect(result.access_token).toBe(token);

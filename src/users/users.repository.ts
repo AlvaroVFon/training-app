@@ -25,17 +25,17 @@ export class UsersRepository {
   }
 
   async findById(id: string): Promise<User | null> {
-    return this.userModel.findById(id).exec();
+    return this.userModel.findById(id).lean().exec() as unknown as User;
   }
   async findByEmail(
     email: string,
     includePassword = false,
   ): Promise<User | null> {
-    const query = this.userModel.findOne({ email });
+    const query = this.userModel.findOne({ email }).lean();
     if (includePassword) {
       query.select('+password');
     }
-    return query.exec();
+    return query.exec() as unknown as User;
   }
   async updateUser(
     id: string,
