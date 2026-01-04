@@ -2,9 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { MuscleGroupsService } from '../muscle-groups/muscle-groups.service';
 import { ExercisesService } from '../exercises/exercises.service';
+import { WorkoutsService } from '../workouts/workouts.service';
 import { SEED_USERS } from './data/users.data';
 import { SEED_MUSCLE_GROUPS } from './data/muscle-groups.data';
 import { SEED_EXERCISES } from './data/exercises.data';
+import { SEED_WORKOUTS } from './data/workouts.data';
 
 @Injectable()
 export class SeedService {
@@ -14,6 +16,7 @@ export class SeedService {
     private readonly usersService: UsersService,
     private readonly muscleGroupsService: MuscleGroupsService,
     private readonly exercisesService: ExercisesService,
+    private readonly workoutsService: WorkoutsService,
   ) {}
 
   async runSeed() {
@@ -21,6 +24,7 @@ export class SeedService {
     await this.seedUsers();
     await this.seedMuscleGroups();
     await this.seedExercises();
+    await this.seedWorkouts();
     this.logger.log('Seed process completed successfully.');
   }
 
@@ -79,5 +83,54 @@ export class SeedService {
     }
 
     this.logger.log(`Exercises: Seeding process finished.`);
+  }
+
+  async seedWorkouts() {
+    this.logger.log('Seeding workouts...');
+    const users = await this.usersService.findAll();
+    if (users.length === 0) {
+      this.logger.warn('No users found to assign workouts.');
+      return;
+    }
+
+    const targetUser = users[0];
+    const existingWorkouts = await this.workoutsService.findAll(
+      (targetUser as any)._id.toString(),
+    );
+
+    if (existingWorkouts.length > 0) {
+      this.logger.log('Workouts already seeded for the first user.');
+      return;
+    }
+
+    const exercises = await this.exercisesService.findAll(
+      (targetUser as any)._id.toString(),
+    );
+
+    for (const workoutData of SEED_WORKOUTS) {
+      const mappedExercises = workoutData.exercises
+        .map((ex) => {
+          const exercise = exercises.find((e) => e.name === ex.exerciseName);
+          if (!exercise) return null;
+          return {
+            exerciseId: (exercise as any)._id.toString(),
+            sets: ex.sets,
+          };
+        })
+        .filter((ex) => ex !== null);
+
+      if (mappedExercises.length > 0) {
+        await this.workoutsService.create(
+          {
+            name: workoutData.name,
+            notes: workoutData.notes,
+            exercises: mappedExercises as any,
+          },
+          (targetUser as any)._id.toString(),
+        );
+      }
+    }
+
+    this.logger.log('Workouts: Seeding process finished.');
   }
 }

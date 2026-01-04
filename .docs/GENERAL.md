@@ -28,6 +28,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 - `src/users`: User management (CRUD).
 - `src/muscle-groups`: Muscle group management (CRUD).
 - `src/exercises`: Exercise management (CRUD with ownership logic).
+- `src/workouts`: Workout tracking and history (User-specific CRUD).
 - `src/tokens`: JWT generation and management.
 - `src/crypto`: Hashing and encryption services.
 - `src/config`: Environment configuration.

@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
 import { MuscleGroupsModule } from './muscle-groups/muscle-groups.module';
 import { ExercisesModule } from './exercises/exercises.module';
+import { WorkoutsModule } from './workouts/workouts.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ExercisesModule } from './exercises/exercises.module';
     SeedModule,
     MuscleGroupsModule,
     ExercisesModule,
+    WorkoutsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

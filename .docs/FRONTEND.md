@@ -36,9 +36,9 @@ From there, you can:
 
 ### Muscle Groups
 
-- `GET /muscle-groups`: List all muscle groups (Requires `admin` role).
+- `GET /muscle-groups`: List all muscle groups (Public/Auth).
 - `POST /muscle-groups`: Create a new muscle group (Requires `admin` role).
-- `GET /muscle-groups/:id`: Get muscle group details (Requires `admin` role).
+- `GET /muscle-groups/:id`: Get muscle group details (Public/Auth).
 - `PATCH /muscle-groups/:id`: Update a muscle group (Requires `admin` role).
 - `DELETE /muscle-groups/:id`: Remove a muscle group (Requires `admin` role).
 
@@ -47,13 +47,19 @@ From there, you can:
 - `GET /exercises`: List all accessible exercises (Default + User's own).
 - `POST /exercises`: Create a new private exercise.
 - `GET /exercises/:id`: Get exercise details (Must be default or owned by user).
-- `PATCH /exercises/:id`: Update an exercise (Admins can update default ones, users can update their own).
-- `DELETE /exercises/:id`: Remove an exercise (Admins can delete default ones, users can delete their own).
+- `PATCH /exercises/:id`: Update an exercise (Users can update their own).
+- `DELETE /exercises/:id`: Remove an exercise (Users can delete their own).
 
-### Workouts (Coming Soon)
+### Workouts
 
+- `GET /workouts`: Retrieve workout history for the current user.
 - `POST /workouts`: Register a new training session.
-- `GET /workouts`: Retrieve workout history.
+- `GET /workouts/:id`: Get details of a specific workout.
+- `PATCH /workouts/:id`: Update a workout session.
+- `DELETE /workouts/:id`: Remove a workout from history.
+
+### AI Analysis (Coming Soon)
+
 - `GET /workouts/:id/analysis`: Get AI-powered analysis for a specific session.
 
 ## Error Handling

@@ -3,9 +3,10 @@ import { SeedService } from './seed.service';
 import { UsersModule } from '../users/users.module';
 import { MuscleGroupsModule } from '../muscle-groups/muscle-groups.module';
 import { ExercisesModule } from '../exercises/exercises.module';
+import { WorkoutsModule } from '../workouts/workouts.module';
 
 @Module({
-  imports: [UsersModule, MuscleGroupsModule, ExercisesModule],
+  imports: [UsersModule, MuscleGroupsModule, ExercisesModule, WorkoutsModule],
   providers: [SeedService],
   exports: [SeedService],
 })
