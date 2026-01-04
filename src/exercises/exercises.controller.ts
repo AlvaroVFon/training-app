@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ExercisesService } from './exercises.service';
@@ -23,8 +26,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('exercises')
+@ApiExtraModels(PaginatedResponseDto, ExerciseDto)
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('exercises')
@@ -51,10 +57,29 @@ export class ExercisesController {
 
   @Get()
   @ApiOperation({ summary: 'Get all accessible exercises (default + owned)' })
-  @ApiResponse({ status: 200, type: [ExerciseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all accessible exercises paginated',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginatedResponseDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(ExerciseDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  findAll(@GetUser('id') userId: string) {
-    return this.exercisesService.findAll(userId);
+  findAll(
+    @GetUser('id') userId: string,
+    @Query() pagination: PaginationQueryDto,
+  ) {
+    return this.exercisesService.findAll(userId, pagination);
   }
 
   @Get(':id')

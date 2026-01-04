@@ -8,6 +8,14 @@ This document describes the simulated user flows used to verify the integration 
 - The database should be seeded (`pnpm seed`).
 - `jq` must be installed for parsing JSON responses in the terminal.
 
+## Pagination & Limits
+
+The API uses a centralized `PaginationService`. By default:
+
+- **Default Limit**: 10 items.
+- **Max Limit**: 100 items.
+- **Normalization**: If a limit > 100 is requested, it will be capped at 100. If a page < 1 is requested, it will default to 1.
+
 ## Flow 1: New User Onboarding & First Workout
 
 **Goal**: Verify that a new user can register, login, browse exercises, and record their first training session.
@@ -31,14 +39,14 @@ This document describes the simulated user flows used to verify the integration 
 3. **Browse Exercises**:
 
    ```bash
-   curl -s -X GET http://localhost:3000/exercises -H "Authorization: Bearer $TOKEN" | jq .
+   curl -s -X GET "http://localhost:3000/exercises?page=1&limit=10" -H "Authorization: Bearer $TOKEN" | jq .
    ```
 
 4. **Create Workout**:
 
    ```bash
-   # Get an exercise ID (e.g., Push-ups)
-   EX_ID=$(curl -s -X GET http://localhost:3000/exercises -H "Authorization: Bearer $TOKEN" | jq -r '.[] | select(.name=="Push-ups") | ._id')
+   # Get an exercise ID (e.g., Push-ups) from the paginated data
+   EX_ID=$(curl -s -X GET "http://localhost:3000/exercises?limit=100" -H "Authorization: Bearer $TOKEN" | jq -r '.data[] | select(.name=="Push-ups") | ._id')
 
    curl -X POST http://localhost:3000/workouts \
      -H "Authorization: Bearer $TOKEN" \
@@ -58,7 +66,7 @@ This document describes the simulated user flows used to verify the integration 
 
 5. **View History**:
    ```bash
-   curl -s -X GET http://localhost:3000/workouts -H "Authorization: Bearer $TOKEN" | jq .
+   curl -s -X GET "http://localhost:3000/workouts?page=1&limit=5" -H "Authorization: Bearer $TOKEN" | jq .
    ```
 
 ## Flow 2: Admin Management

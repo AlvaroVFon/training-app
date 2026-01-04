@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MuscleGroupsService } from './muscle-groups.service';
 import { MuscleGroupsRepository } from './muscle-groups.repository';
 import { MuscleGroup as MuscleGroupEnum } from './enums/muscle-group.enum';
+import { PaginationService } from '../common/pagination.service';
 import { NotFoundException } from '@nestjs/common';
 
 describe('MuscleGroupsService', () => {
@@ -23,6 +24,16 @@ describe('MuscleGroupsService', () => {
     delete: jest.fn(),
   };
 
+  const mockPaginationService = {
+    getPaginationParams: jest.fn().mockReturnValue({ page: 1, limit: 10 }),
+    calculateMeta: jest.fn().mockReturnValue({
+      total: 1,
+      page: 1,
+      lastPage: 1,
+      limit: 10,
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -30,6 +41,10 @@ describe('MuscleGroupsService', () => {
         {
           provide: MuscleGroupsRepository,
           useValue: mockMuscleGroupsRepository,
+        },
+        {
+          provide: PaginationService,
+          useValue: mockPaginationService,
         },
       ],
     }).compile();
@@ -59,13 +74,18 @@ describe('MuscleGroupsService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of muscle groups', async () => {
-      mockMuscleGroupsRepository.findAll.mockResolvedValue([mockMuscleGroup]);
+    it('should return a paginated response of muscle groups', async () => {
+      const pagination = { page: 1, limit: 10 };
+      mockMuscleGroupsRepository.findAll.mockResolvedValue({
+        data: [mockMuscleGroup],
+        total: 1,
+      });
 
-      const result = await service.findAll();
+      const result = await service.findAll(pagination);
 
-      expect(repository.findAll).toHaveBeenCalled();
-      expect(result).toEqual([mockMuscleGroup]);
+      expect(repository.findAll).toHaveBeenCalledWith(pagination);
+      expect(result.data).toEqual([mockMuscleGroup]);
+      expect(result.meta.total).toBe(1);
     });
   });
 

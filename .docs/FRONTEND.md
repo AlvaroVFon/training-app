@@ -19,6 +19,26 @@ From there, you can:
    `Authorization: Bearer <your_token>`
 4. **Roles**: The API uses Role-Based Access Control (RBAC). Some endpoints are restricted to `admin` users.
 
+## Pagination
+
+All list endpoints (`GET` requests returning arrays) follow a standard pagination pattern:
+
+- **Query Parameters**:
+  - `page`: The page number (default: `1`).
+  - `limit`: Items per page (default: `10`, max: `100`).
+- **Response Structure**:
+  ```json
+  {
+    "data": [...],
+    "meta": {
+      "total": 100,
+      "page": 1,
+      "lastPage": 10,
+      "limit": 10
+    }
+  }
+  ```
+
 ## Key Endpoints
 
 ### Auth

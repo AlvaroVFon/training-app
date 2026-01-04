@@ -19,6 +19,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 - **Database**: MongoDB (Mongoose ODM)
 - **Authentication**: Passport.js (Local & JWT strategies)
 - **Authorization**: Role-Based Access Control (RBAC) with custom Guards.
+- **Pagination**: Global offset-based pagination pattern (`page`, `limit`) managed by a centralized `PaginationService`.
 - **AI Integration**: (Planned) Python-based microservice or integrated TensorFlow/ONNX model.
 - **Documentation**: Swagger (OpenAPI)
 

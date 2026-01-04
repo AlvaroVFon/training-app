@@ -8,10 +8,16 @@ import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { Exercise } from './entities/exercise.entity';
 import { Role } from '../auth/enums/role.enum';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
 export class ExercisesService {
-  constructor(private readonly repository: ExercisesRepository) {}
+  constructor(
+    private readonly repository: ExercisesRepository,
+    private readonly paginationService: PaginationService,
+  ) {}
 
   create(
     createExerciseDto: CreateExerciseDto,
@@ -36,8 +42,21 @@ export class ExercisesService {
     return this.repository.create(createExerciseDto, null, true);
   }
 
-  findAll(userId: string): Promise<Exercise[]> {
-    return this.repository.findAll(userId);
+  async findAll(
+    userId: string,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<Exercise>> {
+    const pagination = this.paginationService.getPaginationParams(query);
+    const { data, total } = await this.repository.findAll(userId, pagination);
+
+    return {
+      data,
+      meta: this.paginationService.calculateMeta(
+        total,
+        pagination.page,
+        pagination.limit,
+      ),
+    };
   }
 
   async findOne(id: string, userId: string): Promise<Exercise> {

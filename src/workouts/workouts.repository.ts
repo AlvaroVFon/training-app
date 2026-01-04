@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Workout } from './entities/workout.entity';
 import { CreateWorkoutDto } from './dto/create-workout.dto';
 import { UpdateWorkoutDto } from './dto/update-workout.dto';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 
 @Injectable()
 export class WorkoutsRepository {
@@ -32,12 +33,26 @@ export class WorkoutsRepository {
     return newWorkout.save();
   }
 
-  async findAll(userId: string): Promise<Workout[]> {
-    return this.workoutModel
-      .find({ user: new Types.ObjectId(userId) })
-      .populate('exercises.exercise')
-      .sort({ date: -1 })
-      .exec();
+  async findAll(
+    userId: string,
+    pagination: PaginationQueryDto,
+  ): Promise<{ data: Workout[]; total: number }> {
+    const { page = 1, limit = 10 } = pagination;
+    const skip = (page - 1) * limit;
+    const filter = { user: new Types.ObjectId(userId) };
+
+    const [data, total] = await Promise.all([
+      this.workoutModel
+        .find(filter)
+        .populate('exercises.exercise')
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.workoutModel.countDocuments(filter).exec(),
+    ]);
+
+    return { data, total };
   }
 
   async findOne(id: string, userId: string): Promise<Workout | null> {

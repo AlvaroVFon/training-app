@@ -13,9 +13,11 @@ import { SeedModule } from './seed/seed.module';
 import { MuscleGroupsModule } from './muscle-groups/muscle-groups.module';
 import { ExercisesModule } from './exercises/exercises.module';
 import { WorkoutsModule } from './workouts/workouts.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
+    CommonModule,
     UsersModule,
     ConfigModule.forRoot({
       load: [envConfig],

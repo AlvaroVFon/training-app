@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ExercisesService } from './exercises.service';
 import { ExercisesRepository } from './exercises.repository';
 import { MuscleGroup } from '../muscle-groups/enums/muscle-group.enum';
+import { PaginationService } from '../common/pagination.service';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Role } from '../auth/enums/role.enum';
 import { Types } from 'mongoose';
@@ -38,6 +39,16 @@ describe('ExercisesService', () => {
     delete: jest.fn(),
   };
 
+  const mockPaginationService = {
+    getPaginationParams: jest.fn().mockReturnValue({ page: 1, limit: 10 }),
+    calculateMeta: jest.fn().mockReturnValue({
+      total: 2,
+      page: 1,
+      lastPage: 1,
+      limit: 10,
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -45,6 +56,10 @@ describe('ExercisesService', () => {
         {
           provide: ExercisesRepository,
           useValue: mockExercisesRepository,
+        },
+        {
+          provide: PaginationService,
+          useValue: mockPaginationService,
         },
       ],
     }).compile();
@@ -79,14 +94,19 @@ describe('ExercisesService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all accessible exercises', async () => {
+    it('should return all accessible exercises in a paginated response', async () => {
       const exercises = [mockDefaultExercise, mockUserExercise];
-      mockExercisesRepository.findAll.mockResolvedValue(exercises);
+      const pagination = { page: 1, limit: 10 };
+      mockExercisesRepository.findAll.mockResolvedValue({
+        data: exercises,
+        total: 2,
+      });
 
-      const result = await service.findAll(userId);
+      const result = await service.findAll(userId, pagination);
 
-      expect(repository.findAll).toHaveBeenCalledWith(userId);
-      expect(result).toEqual(exercises);
+      expect(repository.findAll).toHaveBeenCalledWith(userId, pagination);
+      expect(result.data).toEqual(exercises);
+      expect(result.meta.total).toBe(2);
     });
   });
 

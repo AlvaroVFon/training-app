@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { WorkoutsService } from './workouts.service';
@@ -21,9 +24,12 @@ import { UpdateWorkoutDto } from './dto/update-workout.dto';
 import { WorkoutDto } from './dto/workout.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('workouts')
 @ApiBearerAuth()
+@ApiExtraModels(PaginatedResponseDto, WorkoutDto)
 @UseGuards(JwtAuthGuard)
 @Controller('workouts')
 export class WorkoutsController {
@@ -43,10 +49,28 @@ export class WorkoutsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all workouts for the current user' })
-  @ApiResponse({ status: 200, type: [WorkoutDto] })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginatedResponseDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(WorkoutDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  findAll(@GetUser('id') userId: string) {
-    return this.workoutsService.findAll(userId);
+  findAll(
+    @GetUser('id') userId: string,
+    @Query() pagination: PaginationQueryDto,
+  ) {
+    return this.workoutsService.findAll(userId, pagination);
   }
 
   @Get(':id')

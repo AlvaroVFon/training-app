@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { UsersRepository } from './users.repository';
 import { CryptoService } from '../crypto/crypto.service';
+import { PaginationService } from '../common/pagination.service';
 import { NotFoundException } from '@nestjs/common';
 
 describe('UsersService', () => {
@@ -30,6 +31,16 @@ describe('UsersService', () => {
     hashString: jest.fn(),
   };
 
+  const mockPaginationService = {
+    getPaginationParams: jest.fn().mockReturnValue({ page: 1, limit: 10 }),
+    calculateMeta: jest.fn().mockReturnValue({
+      total: 1,
+      page: 1,
+      lastPage: 1,
+      limit: 10,
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -41,6 +52,10 @@ describe('UsersService', () => {
         {
           provide: CryptoService,
           useValue: mockCryptoService,
+        },
+        {
+          provide: PaginationService,
+          useValue: mockPaginationService,
         },
       ],
     }).compile();
@@ -81,14 +96,19 @@ describe('UsersService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of users', async () => {
+    it('should return a paginated response of users', async () => {
       const users = [mockUser];
-      mockUsersRepository.findAll.mockResolvedValue(users);
+      const pagination = { page: 1, limit: 10 };
+      mockUsersRepository.findAll.mockResolvedValue({
+        data: users,
+        total: 1,
+      });
 
-      const result = await service.findAll();
+      const result = await service.findAll(pagination);
 
-      expect(repository.findAll).toHaveBeenCalled();
-      expect(result).toEqual(users);
+      expect(repository.findAll).toHaveBeenCalledWith(pagination);
+      expect(result.data).toEqual(users);
+      expect(result.meta.total).toBe(1);
     });
   });
 

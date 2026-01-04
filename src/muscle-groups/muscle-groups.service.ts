@@ -3,17 +3,35 @@ import { MuscleGroupsRepository } from './muscle-groups.repository';
 import { CreateMuscleGroupDto } from './dto/create-muscle-group.dto';
 import { UpdateMuscleGroupDto } from './dto/update-muscle-group.dto';
 import { MuscleGroup } from './entities/muscle-group.entity';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
 export class MuscleGroupsService {
-  constructor(private readonly repository: MuscleGroupsRepository) {}
+  constructor(
+    private readonly repository: MuscleGroupsRepository,
+    private readonly paginationService: PaginationService,
+  ) {}
 
   create(createMuscleGroupDto: CreateMuscleGroupDto): Promise<MuscleGroup> {
     return this.repository.create(createMuscleGroupDto);
   }
 
-  findAll(): Promise<MuscleGroup[]> {
-    return this.repository.findAll();
+  async findAll(
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<MuscleGroup>> {
+    const pagination = this.paginationService.getPaginationParams(query);
+    const { data, total } = await this.repository.findAll(pagination);
+
+    return {
+      data,
+      meta: this.paginationService.calculateMeta(
+        total,
+        pagination.page,
+        pagination.limit,
+      ),
+    };
   }
 
   async findByName(name: string): Promise<MuscleGroup | null> {

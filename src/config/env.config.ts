@@ -12,4 +12,7 @@ export const envConfig = () => ({
   // JWT
   jwtSecret: process.env.JWT_SECRET || 'defaultSecret',
   jwtExpiration: process.env.JWT_EXPIRATION || '3600s',
+  // PAGINATION
+  paginationDefaultLimit: process.env.PAGINATION_DEFAULT_LIMIT || 10,
+  paginationMaxLimit: process.env.PAGINATION_MAX_LIMIT || 100,
 });

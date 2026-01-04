@@ -9,10 +9,16 @@ import {
 } from './dto/workout.dto';
 import { Workout } from './entities/workout.entity';
 import { Exercise } from '../exercises/entities/exercise.entity';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
+import { PaginationService } from '../common/pagination.service';
 
 @Injectable()
 export class WorkoutsService {
-  constructor(private readonly workoutsRepository: WorkoutsRepository) {}
+  constructor(
+    private readonly workoutsRepository: WorkoutsRepository,
+    private readonly paginationService: PaginationService,
+  ) {}
 
   async create(
     createWorkoutDto: CreateWorkoutDto,
@@ -25,9 +31,24 @@ export class WorkoutsService {
     return this.mapToDto(workout);
   }
 
-  async findAll(userId: string): Promise<WorkoutDto[]> {
-    const workouts = await this.workoutsRepository.findAll(userId);
-    return workouts.map((w) => this.mapToDto(w));
+  async findAll(
+    userId: string,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<WorkoutDto>> {
+    const pagination = this.paginationService.getPaginationParams(query);
+    const { data, total } = await this.workoutsRepository.findAll(
+      userId,
+      pagination,
+    );
+
+    return {
+      data: data.map((w) => this.mapToDto(w)),
+      meta: this.paginationService.calculateMeta(
+        total,
+        pagination.page,
+        pagination.limit,
+      ),
+    };
   }
 
   async findOne(id: string, userId: string): Promise<WorkoutDto> {

@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiExtraModels,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { MuscleGroupsService } from './muscle-groups.service';
@@ -23,8 +26,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('muscle-groups')
+@ApiExtraModels(PaginatedResponseDto, MuscleGroupDto)
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
@@ -45,11 +51,27 @@ export class MuscleGroupsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all muscle groups' })
-  @ApiResponse({ status: 200, type: [MuscleGroupDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all muscle groups paginated',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(PaginatedResponseDto) },
+        {
+          properties: {
+            data: {
+              type: 'array',
+              items: { $ref: getSchemaPath(MuscleGroupDto) },
+            },
+          },
+        },
+      ],
+    },
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
-  findAll() {
-    return this.muscleGroupsService.findAll();
+  findAll(@Query() pagination: PaginationQueryDto) {
+    return this.muscleGroupsService.findAll(pagination);
   }
 
   @Get(':id')

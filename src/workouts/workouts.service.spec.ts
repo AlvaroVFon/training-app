@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkoutsService } from './workouts.service';
 import { WorkoutsRepository } from './workouts.repository';
+import { PaginationService } from '../common/pagination.service';
 import { NotFoundException } from '@nestjs/common';
 import { Types } from 'mongoose';
 
@@ -29,10 +30,20 @@ describe('WorkoutsService', () => {
 
   const mockWorkoutsRepository = {
     create: jest.fn().mockResolvedValue(mockWorkout),
-    findAll: jest.fn().mockResolvedValue([mockWorkout]),
+    findAll: jest.fn().mockResolvedValue({ data: [mockWorkout], total: 1 }),
     findOne: jest.fn().mockResolvedValue(mockWorkout),
     update: jest.fn().mockResolvedValue(mockWorkout),
     remove: jest.fn().mockResolvedValue(mockWorkout),
+  };
+
+  const mockPaginationService = {
+    getPaginationParams: jest.fn().mockReturnValue({ page: 1, limit: 10 }),
+    calculateMeta: jest.fn().mockReturnValue({
+      total: 1,
+      page: 1,
+      lastPage: 1,
+      limit: 10,
+    }),
   };
 
   beforeEach(async () => {
@@ -42,6 +53,10 @@ describe('WorkoutsService', () => {
         {
           provide: WorkoutsRepository,
           useValue: mockWorkoutsRepository,
+        },
+        {
+          provide: PaginationService,
+          useValue: mockPaginationService,
         },
       ],
     }).compile();
@@ -68,11 +83,13 @@ describe('WorkoutsService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an array of workouts', async () => {
-      const result = await service.findAll('userId');
-      expect(result).toBeInstanceOf(Array);
-      expect(result.length).toBe(1);
-      expect(repository.findAll).toHaveBeenCalledWith('userId');
+    it('should return a paginated response of workouts', async () => {
+      const pagination = { page: 1, limit: 10 };
+      const result = await service.findAll('userId', pagination);
+      expect(result.data).toBeInstanceOf(Array);
+      expect(result.data.length).toBe(1);
+      expect(result.meta.total).toBe(1);
+      expect(repository.findAll).toHaveBeenCalledWith('userId', pagination);
     });
   });
 
