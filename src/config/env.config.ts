@@ -4,7 +4,7 @@ export const envConfig = () => ({
   host: process.env.APP_HOST || 'localhost',
   port: process.env.APP_PORT || 3000,
   // DB
-  dbHost: process.env.DB_HOST || 'localhost',
+  dbHost: process.env.DB_HOST || 'mongodb',
   dbPort: process.env.DB_PORT || 27017,
   dbUsername: process.env.DB_USERNAME || 'mongoUser',
   dbPassword: process.env.DB_PASSWORD || 'mongoPass',

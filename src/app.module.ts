@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { envConfig } from './config/env.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
+import { CryptoModule } from './cryto/crypto.module';
 
 @Module({
   imports: [
@@ -16,12 +17,13 @@ import { ConfigService } from '@nestjs/config';
     }),
     MongooseModule.forRootAsync({
       useFactory: (config: ConfigService) => ({
-        uri: `mongodb://${config.get<string>('dbHost')}:${config.get<number>('dbPort')}/${config.get<string>('dbDatabase')}`,
+        uri: `mongodb://${config.get<string>('dbHost')}:${config.get<number>('dbPort')}/${config.get<string>('dbDatabase')}?authSource=admin`,
         user: config.get<string>('dbUsername'),
         pass: config.get<string>('dbPassword'),
       }),
       inject: [ConfigService],
     }),
+    CryptoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

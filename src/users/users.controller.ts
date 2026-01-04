@@ -6,8 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-  ParseMongoIdPipe,
 } from '@nestjs/common';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -27,20 +27,20 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseMongoIdPipe) id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id', ParseMongoIdPipe) id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseMongoIdPipe) id: string) {
+  remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.usersService.remove(id);
   }
 }
