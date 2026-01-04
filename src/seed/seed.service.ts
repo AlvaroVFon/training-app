@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { MuscleGroupsService } from '../muscle-groups/muscle-groups.service';
+import { ExercisesService } from '../exercises/exercises.service';
 import { SEED_USERS } from './data/users.data';
 import { SEED_MUSCLE_GROUPS } from './data/muscle-groups.data';
+import { SEED_EXERCISES } from './data/exercises.data';
 
 @Injectable()
 export class SeedService {
@@ -11,12 +13,14 @@ export class SeedService {
   constructor(
     private readonly usersService: UsersService,
     private readonly muscleGroupsService: MuscleGroupsService,
+    private readonly exercisesService: ExercisesService,
   ) {}
 
   async runSeed() {
     this.logger.log('Starting seed process...');
     await this.seedUsers();
     await this.seedMuscleGroups();
+    await this.seedExercises();
     this.logger.log('Seed process completed successfully.');
   }
 
@@ -58,5 +62,22 @@ export class SeedService {
     this.logger.log(
       `Muscle Groups: ${createdCount} created, ${skippedCount} skipped (already exist).`,
     );
+  }
+
+  async seedExercises() {
+    this.logger.log('Seeding exercises...');
+    let createdCount = 0;
+    const skippedCount = 0;
+
+    for (const exerciseData of SEED_EXERCISES) {
+      const existing = await this.exercisesService.createDefault(exerciseData);
+      if (existing) {
+        // Since createDefault handles existence check, we just count
+        // This is a bit simplified, but works for seeding
+        createdCount++;
+      }
+    }
+
+    this.logger.log(`Exercises: Seeding process finished.`);
   }
 }

@@ -42,6 +42,14 @@ From there, you can:
 - `PATCH /muscle-groups/:id`: Update a muscle group (Requires `admin` role).
 - `DELETE /muscle-groups/:id`: Remove a muscle group (Requires `admin` role).
 
+### Exercises
+
+- `GET /exercises`: List all accessible exercises (Default + User's own).
+- `POST /exercises`: Create a new private exercise.
+- `GET /exercises/:id`: Get exercise details (Must be default or owned by user).
+- `PATCH /exercises/:id`: Update an exercise (Admins can update default ones, users can update their own).
+- `DELETE /exercises/:id`: Remove an exercise (Admins can delete default ones, users can delete their own).
+
 ### Workouts (Coming Soon)
 
 - `POST /workouts`: Register a new training session.

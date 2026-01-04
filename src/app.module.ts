@@ -11,6 +11,7 @@ import { TokensModule } from './tokens/tokens.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
 import { MuscleGroupsModule } from './muscle-groups/muscle-groups.module';
+import { ExercisesModule } from './exercises/exercises.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { MuscleGroupsModule } from './muscle-groups/muscle-groups.module';
     AuthModule,
     SeedModule,
     MuscleGroupsModule,
+    ExercisesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
