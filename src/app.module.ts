@@ -7,6 +7,7 @@ import { envConfig } from './config/env.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { CryptoModule } from './crypto/crypto.module';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CryptoModule } from './crypto/crypto.module';
       inject: [ConfigService],
     }),
     CryptoModule,
+    TokensModule,
   ],
   controllers: [AppController],
   providers: [AppService],

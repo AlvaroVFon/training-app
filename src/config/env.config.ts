@@ -9,4 +9,7 @@ export const envConfig = () => ({
   dbUsername: process.env.DB_USERNAME || 'mongoUser',
   dbPassword: process.env.DB_PASSWORD || 'mongoPass',
   dbDatabase: process.env.DB_DATABASE || 'training-app',
+  // JWT
+  jwtSecret: process.env.JWT_SECRET || 'defaultSecret',
+  jwtExpiration: process.env.JWT_EXPIRATION || '3600s',
 });
