@@ -28,6 +28,7 @@ describe('AuthService', () => {
 
   const mockUsersService = {
     findByEmail: jest.fn(),
+    create: jest.fn(),
   };
 
   const mockCryptoService = {
@@ -65,6 +66,26 @@ describe('AuthService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('register', () => {
+    it('should create a user and return login response', async () => {
+      const createUserDto = {
+        email: 'new@example.com',
+        password: 'password123',
+        name: 'New User',
+        age: 25,
+      };
+      const token = 'jwt_token';
+      mockUsersService.create.mockResolvedValue(mockUser);
+      mockTokensService.generateToken.mockReturnValue(token);
+
+      const result = await service.register(createUserDto);
+
+      expect(usersService.create).toHaveBeenCalledWith(createUserDto);
+      expect(result.access_token).toBe(token);
+      expect(result.user).toEqual(mockUser);
+    });
   });
 
   describe('validateUser', () => {

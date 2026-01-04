@@ -7,6 +7,7 @@ import {
   LoginResponse,
 } from './interfaces/auth-credentials.interface';
 import { User } from '../users/entities/user.entity';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,11 @@ export class AuthService {
     private readonly cryptoService: CryptoService,
     private readonly tokensService: TokensService,
   ) {}
+
+  async register(createUserDto: CreateUserDto): Promise<LoginResponse> {
+    const user = await this.usersService.create(createUserDto);
+    return this.login(user as any);
+  }
 
   async validateUser(credentials: LocalCredentials): Promise<User | null> {
     const user = await this.usersService.findByEmail(credentials.email, true);

@@ -26,20 +26,25 @@
 A NestJS application for registering workouts and analyzing them using AI models.
 
 ## 🏋️ Project Goal
+
 The Training App allows users to log their physical activities and receive intelligent feedback through an AI-driven analysis system, helping athletes optimize their performance and track progress effectively.
 
 ## 📚 Documentation
-- [General Documentation](docs/GENERAL.md)
-- [Frontend Integration Guide](docs/FRONTEND.md)
+
+- [General Documentation](.docs/GENERAL.md)
+- [Frontend Integration Guide](.docs/FRONTEND.md)
 - **Interactive API Docs (Swagger)**: Available at `http://localhost:3000/api` when the server is running.
 
 ## 🚀 Quick Start
+
 ### Using Docker (Recommended)
+
 ```bash
 docker-compose up --build
 ```
 
 ### Local Development
+
 1. Install dependencies:
    ```bash
    pnpm install
@@ -51,6 +56,7 @@ docker-compose up --build
    ```
 
 ## 🧪 Testing
+
 ```bash
 # unit tests
 pnpm test
