@@ -21,40 +21,42 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# Training App API
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A NestJS application for registering workouts and analyzing them using AI models.
 
-## Project setup
+## 🏋️ Project Goal
+The Training App allows users to log their physical activities and receive intelligent feedback through an AI-driven analysis system, helping athletes optimize their performance and track progress effectively.
 
+## 📚 Documentation
+- [General Documentation](docs/GENERAL.md)
+- [Frontend Integration Guide](docs/FRONTEND.md)
+- **Interactive API Docs (Swagger)**: Available at `http://localhost:3000/api` when the server is running.
+
+## 🚀 Quick Start
+### Using Docker (Recommended)
 ```bash
-$ pnpm install
+docker-compose up --build
 ```
 
-## Compile and run the project
+### Local Development
+1. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+2. Set up environment variables in `.env`.
+3. Run the app:
+   ```bash
+   pnpm run start:dev
+   ```
 
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
-```
-
-## Run tests
-
+## 🧪 Testing
 ```bash
 # unit tests
-$ pnpm run test
+pnpm test
 
 # e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm test:e2e
 ```
 
 ## Deployment
