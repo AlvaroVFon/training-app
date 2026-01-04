@@ -10,6 +10,7 @@ import { CryptoModule } from './crypto/crypto.module';
 import { TokensModule } from './tokens/tokens.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
+import { MuscleGroupsModule } from './muscle-groups/muscle-groups.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { SeedModule } from './seed/seed.module';
     TokensModule,
     AuthModule,
     SeedModule,
+    MuscleGroupsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

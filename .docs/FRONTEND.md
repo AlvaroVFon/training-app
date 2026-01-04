@@ -34,6 +34,14 @@ From there, you can:
 - `PATCH /users/:id`: Update user details (Requires Auth).
 - `DELETE /users/:id`: Remove a user (Requires `admin` role).
 
+### Muscle Groups
+
+- `GET /muscle-groups`: List all muscle groups (Requires `admin` role).
+- `POST /muscle-groups`: Create a new muscle group (Requires `admin` role).
+- `GET /muscle-groups/:id`: Get muscle group details (Requires `admin` role).
+- `PATCH /muscle-groups/:id`: Update a muscle group (Requires `admin` role).
+- `DELETE /muscle-groups/:id`: Remove a muscle group (Requires `admin` role).
+
 ### Workouts (Coming Soon)
 
 - `POST /workouts`: Register a new training session.
