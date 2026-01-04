@@ -3,8 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 
 export interface TokenPayload {
-  userId: string;
+  sub: string;
   type?: string;
+  [key: string]: any;
 }
 
 @Injectable()

@@ -27,7 +27,16 @@ export class UsersRepository {
   async findById(id: string): Promise<User | null> {
     return this.userModel.findById(id).exec();
   }
-
+  async findByEmail(
+    email: string,
+    includePassword = false,
+  ): Promise<User | null> {
+    const query = this.userModel.findOne({ email });
+    if (includePassword) {
+      query.select('+password');
+    }
+    return query.exec();
+  }
   async updateUser(
     id: string,
     updateUserDto: UpdateUserDto,

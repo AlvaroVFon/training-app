@@ -21,6 +21,7 @@ describe('UsersService', () => {
     createUser: jest.fn(),
     findAll: jest.fn(),
     findById: jest.fn(),
+    findByEmail: jest.fn(),
     updateUser: jest.fn(),
     deleteUser: jest.fn(),
   };
@@ -105,6 +106,32 @@ describe('UsersService', () => {
       mockUsersRepository.findById.mockResolvedValue(null);
 
       await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findByEmail', () => {
+    it('should return a user if found by email', async () => {
+      mockUsersRepository.findByEmail.mockResolvedValue(mockUser);
+
+      const result = await service.findByEmail('test@example.com');
+
+      expect(repository.findByEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        false,
+      );
+      expect(result).toEqual(mockUser);
+    });
+
+    it('should return a user with password if includePassword is true', async () => {
+      mockUsersRepository.findByEmail.mockResolvedValue(mockUser);
+
+      const result = await service.findByEmail('test@example.com', true);
+
+      expect(repository.findByEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        true,
+      );
+      expect(result).toEqual(mockUser);
     });
   });
 

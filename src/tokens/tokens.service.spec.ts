@@ -33,24 +33,24 @@ describe('TokensService', () => {
   });
 
   describe('generateToken', () => {
-    it('should generate a valid JWT token with userId', () => {
-      const payload = { userId: '123' };
+    it('should generate a valid JWT token with sub', () => {
+      const payload = { sub: '123' };
       const token = service.generateToken(payload);
 
       expect(token).toBeDefined();
       expect(typeof token).toBe('string');
 
       const decoded = jwt.verify(token, 'testSecret') as any;
-      expect(decoded.userId).toBe(payload.userId);
+      expect(decoded.sub).toBe(payload.sub);
     });
 
-    it('should generate a valid JWT token with userId and type', () => {
-      const payload = { userId: '123', type: 'access' };
+    it('should generate a valid JWT token with sub and type', () => {
+      const payload = { sub: '123', type: 'access' };
       const token = service.generateToken(payload);
 
       expect(token).toBeDefined();
       const decoded = jwt.verify(token, 'testSecret') as any;
-      expect(decoded.userId).toBe(payload.userId);
+      expect(decoded.sub).toBe(payload.sub);
       expect(decoded.type).toBe(payload.type);
     });
   });

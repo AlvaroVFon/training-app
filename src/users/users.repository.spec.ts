@@ -20,6 +20,7 @@ describe('UsersRepository', () => {
     create: jest.fn(),
     find: jest.fn(),
     findById: jest.fn(),
+    findOne: jest.fn(),
     findByIdAndUpdate: jest.fn(),
     findByIdAndDelete: jest.fn(),
   };
@@ -102,6 +103,33 @@ describe('UsersRepository', () => {
 
       const result = await repository.findById('someId');
       expect(result).toBeNull();
+    });
+  });
+
+  describe('findByEmail', () => {
+    it('should return a user if found by email', async () => {
+      const mockQuery = {
+        exec: jest.fn().mockResolvedValue(mockUser),
+      };
+      mockUserModel.findOne.mockReturnValue(mockQuery);
+
+      const result = await repository.findByEmail('test@example.com');
+      expect(result).toEqual(mockUser);
+      expect(mockUserModel.findOne).toHaveBeenCalledWith({
+        email: 'test@example.com',
+      });
+    });
+
+    it('should include password if includePassword is true', async () => {
+      const mockQuery = {
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(mockUser),
+      };
+      mockUserModel.findOne.mockReturnValue(mockQuery);
+
+      const result = await repository.findByEmail('test@example.com', true);
+      expect(result).toEqual(mockUser);
+      expect(mockQuery.select).toHaveBeenCalledWith('+password');
     });
   });
 

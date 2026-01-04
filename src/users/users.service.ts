@@ -34,6 +34,12 @@ export class UsersService {
     }
     return user;
   }
+  async findByEmail(
+    email: string,
+    includePassword = false,
+  ): Promise<User | null> {
+    return this.usersRepository.findByEmail(email, includePassword);
+  }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.usersRepository.updateUser(id, updateUserDto);

@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { CryptoModule } from './crypto/crypto.module';
 import { TokensModule } from './tokens/tokens.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TokensModule } from './tokens/tokens.module';
     }),
     CryptoModule,
     TokensModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
