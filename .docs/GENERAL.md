@@ -63,3 +63,4 @@ This process is idempotent and can be run multiple times safely.
 
 - **Unit Tests**: `pnpm test`
 - **E2E Tests**: `pnpm test:e2e`
+- **Integration Flows**: See [INTEGRATION_TESTS.md](INTEGRATION_TESTS.md) for manual verification using `curl`.
