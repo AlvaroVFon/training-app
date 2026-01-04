@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { CryptoModule } from './crypto/crypto.module';
 import { TokensModule } from './tokens/tokens.module';
 import { AuthModule } from './auth/auth.module';
+import { SeedModule } from './seed/seed.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
     CryptoModule,
     TokensModule,
     AuthModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

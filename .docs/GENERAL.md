@@ -44,6 +44,16 @@ docker-compose up --build
 The API will be available at `http://localhost:3000`.
 Swagger documentation is at `http://localhost:3000/api`.
 
+### Database Seeding
+
+To populate the database with initial data (admin and test users), run:
+
+```bash
+docker-compose exec app pnpm seed
+```
+
+This process is idempotent and can be run multiple times safely.
+
 ## Testing
 
 - **Unit Tests**: `pnpm test`
