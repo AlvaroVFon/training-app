@@ -1,0 +1,137 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { getModelToken } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { UsersRepository } from './users.repository';
+import { User } from './entities/user.entity';
+import { ConflictException } from '@nestjs/common';
+
+describe('UsersRepository', () => {
+  let repository: UsersRepository;
+  let model: Model<User>;
+
+  const mockUser = {
+    name: 'Test User',
+    email: 'test@example.com',
+    password: 'hashedPassword',
+    age: 25,
+  };
+
+  const mockUserModel = {
+    create: jest.fn(),
+    find: jest.fn(),
+    findById: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
+    findByIdAndDelete: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UsersRepository,
+        {
+          provide: getModelToken(User.name),
+          useValue: mockUserModel,
+        },
+      ],
+    }).compile();
+
+    repository = module.get<UsersRepository>(UsersRepository);
+    model = module.get<Model<User>>(getModelToken(User.name));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should be defined', () => {
+    expect(repository).toBeDefined();
+  });
+
+  describe('createUser', () => {
+    it('should create a user successfully', async () => {
+      mockUserModel.create.mockResolvedValue(mockUser);
+      const result = await repository.createUser(mockUser as any);
+      expect(result).toEqual(mockUser);
+      expect(mockUserModel.create).toHaveBeenCalledWith(mockUser);
+    });
+
+    it('should throw ConflictException if email already exists', async () => {
+      mockUserModel.create.mockRejectedValue({ code: 11000 });
+      await expect(repository.createUser(mockUser as any)).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('should throw original error if it is not a duplicate key error', async () => {
+      const error = new Error('Some other error');
+      mockUserModel.create.mockRejectedValue(error);
+      await expect(repository.createUser(mockUser as any)).rejects.toThrow(
+        error,
+      );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return an array of users', async () => {
+      const users = [mockUser];
+      mockUserModel.find.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(users),
+      } as any);
+
+      const result = await repository.findAll();
+      expect(result).toEqual(users);
+      expect(mockUserModel.find).toHaveBeenCalled();
+    });
+  });
+
+  describe('findById', () => {
+    it('should return a user if found', async () => {
+      mockUserModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockUser),
+      } as any);
+
+      const result = await repository.findById('someId');
+      expect(result).toEqual(mockUser);
+      expect(mockUserModel.findById).toHaveBeenCalledWith('someId');
+    });
+
+    it('should return null if user not found', async () => {
+      mockUserModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(null),
+      } as any);
+
+      const result = await repository.findById('someId');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('updateUser', () => {
+    it('should update and return the user', async () => {
+      const updateDto = { name: 'Updated Name' };
+      const updatedUser = { ...mockUser, ...updateDto };
+      mockUserModel.findByIdAndUpdate.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(updatedUser),
+      } as any);
+
+      const result = await repository.updateUser('someId', updateDto);
+      expect(result).toEqual(updatedUser);
+      expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        'someId',
+        updateDto,
+        { new: true },
+      );
+    });
+  });
+
+  describe('deleteUser', () => {
+    it('should delete and return the user', async () => {
+      mockUserModel.findByIdAndDelete.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockUser),
+      } as any);
+
+      const result = await repository.deleteUser('someId');
+      expect(result).toEqual(mockUser);
+      expect(mockUserModel.findByIdAndDelete).toHaveBeenCalledWith('someId');
+    });
+  });
+});

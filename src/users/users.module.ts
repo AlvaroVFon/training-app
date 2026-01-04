@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UsersRepository } from './users.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CryptoModule } from 'src/cryto/crypto.module';
+import { CryptoModule } from '../crypto/crypto.module';
 import { User, UserSchema } from './entities/user.entity';
 
 @Module({
