@@ -41,12 +41,12 @@ describe('ExercisesService', () => {
 
   const mockPaginationService = {
     getPaginationParams: jest.fn().mockReturnValue({ page: 1, limit: 10 }),
-    calculateMeta: jest.fn().mockReturnValue({
-      total: 2,
-      page: 1,
-      lastPage: 1,
-      limit: 10,
-    }),
+    calculateMeta: jest.fn().mockImplementation((total, page, limit) => ({
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+      limit,
+    })),
   };
 
   beforeEach(async () => {
@@ -96,17 +96,40 @@ describe('ExercisesService', () => {
   describe('findAll', () => {
     it('should return all accessible exercises in a paginated response', async () => {
       const exercises = [mockDefaultExercise, mockUserExercise];
-      const pagination = { page: 1, limit: 10 };
+      const query = { page: 1, limit: 10 };
       mockExercisesRepository.findAll.mockResolvedValue({
         data: exercises,
         total: 2,
       });
 
-      const result = await service.findAll(userId, pagination);
+      const result = await service.findAll(userId, query);
 
-      expect(repository.findAll).toHaveBeenCalledWith(userId, pagination);
+      expect(repository.findAll).toHaveBeenCalledWith(userId, {
+        ...query,
+        page: 1,
+        limit: 10,
+      });
       expect(result.data).toEqual(exercises);
       expect(result.meta.total).toBe(2);
+    });
+
+    it('should filter exercises by muscle group', async () => {
+      const exercises = [mockDefaultExercise];
+      const query = { page: 1, limit: 10, muscleGroup: MuscleGroup.CHEST };
+      mockExercisesRepository.findAll.mockResolvedValue({
+        data: exercises,
+        total: 1,
+      });
+
+      const result = await service.findAll(userId, query);
+
+      expect(repository.findAll).toHaveBeenCalledWith(userId, {
+        ...query,
+        page: 1,
+        limit: 10,
+      });
+      expect(result.data).toEqual(exercises);
+      expect(result.meta.total).toBe(1);
     });
   });
 

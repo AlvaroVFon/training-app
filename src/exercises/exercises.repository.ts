@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Exercise } from './entities/exercise.entity';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { ExerciseQueryDto } from './dto/exercise-query.dto';
 
 @Injectable()
 export class ExercisesRepository {
@@ -36,13 +36,18 @@ export class ExercisesRepository {
 
   async findAll(
     userId: string,
-    pagination: PaginationQueryDto,
+    query: ExerciseQueryDto,
   ): Promise<{ data: Exercise[]; total: number }> {
-    const { page = 1, limit = 10 } = pagination;
+    const { page = 1, limit = 10, muscleGroup } = query;
     const skip = (page - 1) * limit;
-    const filter = {
+
+    const filter: any = {
       $or: [{ isDefault: true }, { createdBy: new Types.ObjectId(userId) }],
     };
+
+    if (muscleGroup) {
+      filter.muscleGroup = muscleGroup;
+    }
 
     const [data, total] = await Promise.all([
       this.exerciseModel.find(filter).skip(skip).limit(limit).exec(),

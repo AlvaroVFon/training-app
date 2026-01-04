@@ -118,7 +118,25 @@ The API uses a centralized `PaginationService`. By default:
    curl -X GET http://localhost:3000/workouts/$WORKOUT_ID -H "Authorization: Bearer $USER_B_TOKEN"
    ```
 
-4. **Unauthorized Delete**:
+## Flow 4: Advanced Search & Filtering
+
+**Goal**: Verify that exercises can be filtered by muscle group.
+
+1. **Filter by Chest**:
+
+   ```bash
+   curl -s -X GET "http://localhost:3000/exercises?muscleGroup=chest" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+2. **Filter by Biceps**:
+
+   ```bash
+   curl -s -X GET "http://localhost:3000/exercises?muscleGroup=biceps" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+3. **Unauthorized Delete**:
    ```bash
    # Should return 404 Not Found
    curl -X DELETE http://localhost:3000/workouts/$WORKOUT_ID -H "Authorization: Bearer $USER_B_TOKEN"

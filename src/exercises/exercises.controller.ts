@@ -26,7 +26,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { Role } from '../auth/enums/role.enum';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { ExerciseQueryDto } from './dto/exercise-query.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
 @ApiTags('exercises')
@@ -75,11 +75,8 @@ export class ExercisesController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  findAll(
-    @GetUser('id') userId: string,
-    @Query() pagination: PaginationQueryDto,
-  ) {
-    return this.exercisesService.findAll(userId, pagination);
+  findAll(@GetUser('id') userId: string, @Query() query: ExerciseQueryDto) {
+    return this.exercisesService.findAll(userId, query);
   }
 
   @Get(':id')

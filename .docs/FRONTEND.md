@@ -65,6 +65,8 @@ All list endpoints (`GET` requests returning arrays) follow a standard paginatio
 ### Exercises
 
 - `GET /exercises`: List all accessible exercises (Default + User's own).
+  - **Filters**:
+    - `muscleGroup`: Filter by muscle group (e.g., `GET /exercises?muscleGroup=chest`).
 - `POST /exercises`: Create a new private exercise.
 - `GET /exercises/:id`: Get exercise details (Must be default or owned by user).
 - `PATCH /exercises/:id`: Update an exercise (Users can update their own).

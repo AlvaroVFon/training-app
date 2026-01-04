@@ -8,7 +8,7 @@ import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { Exercise } from './entities/exercise.entity';
 import { Role } from '../auth/enums/role.enum';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
+import { ExerciseQueryDto } from './dto/exercise-query.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 import { PaginationService } from '../common/pagination.service';
 
@@ -44,10 +44,13 @@ export class ExercisesService {
 
   async findAll(
     userId: string,
-    query: PaginationQueryDto,
+    query: ExerciseQueryDto,
   ): Promise<PaginatedResponseDto<Exercise>> {
     const pagination = this.paginationService.getPaginationParams(query);
-    const { data, total } = await this.repository.findAll(userId, pagination);
+    const { data, total } = await this.repository.findAll(userId, {
+      ...query,
+      ...pagination,
+    });
 
     return {
       data,
