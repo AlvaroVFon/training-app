@@ -33,12 +33,12 @@ import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 @ApiExtraModels(PaginatedResponseDto, MuscleGroupDto)
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN)
 @Controller('muscle-groups')
 export class MuscleGroupsController {
   constructor(private readonly muscleGroupsService: MuscleGroupsService) {}
 
   @Post()
+  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Create a new muscle group' })
   @ApiResponse({ status: 201, type: MuscleGroupDto })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -69,7 +69,6 @@ export class MuscleGroupsController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   findAll(@Query() pagination: PaginationQueryDto) {
     return this.muscleGroupsService.findAll(pagination);
   }
@@ -80,13 +79,13 @@ export class MuscleGroupsController {
   @ApiResponse({ status: 200, type: MuscleGroupDto })
   @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   findOne(@Param('id') id: string) {
     return this.muscleGroupsService.findOne(id);
   }
 
   @Patch(':id')
+  @Roles(Role.ADMIN)
   @UseGuards(ValidateObjectIdGuard)
   @ApiOperation({ summary: 'Update a muscle group' })
   @ApiResponse({ status: 200, type: MuscleGroupDto })
@@ -102,6 +101,7 @@ export class MuscleGroupsController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   @UseGuards(ValidateObjectIdGuard)
   @ApiOperation({ summary: 'Delete a muscle group' })
   @ApiResponse({ status: 200, type: MuscleGroupDto })
