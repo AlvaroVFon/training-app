@@ -17,7 +17,7 @@ export class ExerciseOwnershipGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const exerciseId = request.params.id;
+    const exerciseId = request.params.exerciseId || request.params.id;
 
     if (!user || !exerciseId) {
       return false;

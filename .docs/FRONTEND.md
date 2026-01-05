@@ -80,6 +80,16 @@ All list endpoints (`GET` requests returning arrays) follow a standard paginatio
 - `PATCH /workouts/:id`: Update a workout session.
 - `DELETE /workouts/:id`: Remove a workout from history.
 
+### Statistics
+
+All statistics endpoints support optional date range filtering via query parameters: `startDate` and `endDate` (ISO 8601 format).
+
+- `GET /statistics/summary/:userId?`: Get general training summary (Total volume, reps, workouts).
+- `GET /statistics/muscle-distribution/:userId?`: Get distribution of sets per muscle group.
+- `GET /statistics/progress/:exerciseId/:userId?`: Get progression for a specific exercise (1RM, volume, max weight).
+
+_Note: Regular users can only access their own statistics. Admins can specify a `:userId` to view other users' data._
+
 ### AI Analysis (Coming Soon)
 
 - `GET /workouts/:id/analysis`: Get AI-powered analysis for a specific session.

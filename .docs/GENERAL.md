@@ -10,6 +10,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 - **Muscle Group Management**: CRUD operations for muscle groups (Admin only).
 - **Exercise Management**: System-wide default exercises and user-specific custom exercises.
 - **Workout Tracking**: Register exercises, sets, reps, and weights.
+- **Statistics & Progress**: Advanced data aggregation for training summaries, muscle distribution, and exercise progression with date range filtering.
 - **AI Analysis**: Automated analysis of training sessions using machine learning models.
 - **Progress Monitoring**: Historical data and performance trends.
 
@@ -17,6 +18,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 
 - **Framework**: NestJS (v11)
 - **Database**: MongoDB (Mongoose ODM)
+- **Aggregation Engine**: Mongoose Aggregation Pipelines for high-performance statistics calculation.
 - **Authentication**: Passport.js (Local & JWT strategies)
 - **Authorization**: Role-Based Access Control (RBAC) and Resource Ownership validation.
 - **Security Patterns**:
@@ -34,6 +36,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 - `src/muscle-groups`: Muscle group management (CRUD).
 - `src/exercises`: Exercise management (CRUD with ownership logic).
 - `src/workouts`: Workout tracking and history (User-specific CRUD).
+- `src/statistics`: Data aggregation and performance metrics.
 - `src/tokens`: JWT generation and management.
 - `src/crypto`: Hashing and encryption services.
 - `src/config`: Environment configuration.

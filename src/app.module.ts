@@ -13,6 +13,7 @@ import { SeedModule } from './seed/seed.module';
 import { MuscleGroupsModule } from './muscle-groups/muscle-groups.module';
 import { ExercisesModule } from './exercises/exercises.module';
 import { WorkoutsModule } from './workouts/workouts.module';
+import { StatisticsModule } from './statistics/statistics.module';
 import { CommonModule } from './common/common.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { CommonModule } from './common/common.module';
     MuscleGroupsModule,
     ExercisesModule,
     WorkoutsModule,
+    StatisticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

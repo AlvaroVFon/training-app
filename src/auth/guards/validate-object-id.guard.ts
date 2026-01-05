@@ -10,10 +10,19 @@ import { Types } from 'mongoose';
 export class ValidateObjectIdGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const id = request.params.id;
+    const params = request.params;
 
-    if (id && !Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`Invalid ID: ${id}`);
+    for (const key in params) {
+      const value = params[key];
+      if (
+        (key === 'id' || key.toLowerCase().endsWith('id')) &&
+        value &&
+        !Types.ObjectId.isValid(value)
+      ) {
+        throw new BadRequestException(
+          `Invalid ID format for parameter: ${key}`,
+        );
+      }
     }
 
     return true;

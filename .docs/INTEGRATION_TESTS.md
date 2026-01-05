@@ -98,6 +98,39 @@ The API uses a centralized `PaginationService`. By default:
      -d '{"name": "Reverse Wrist Curls", "description": "Isolation", "muscleGroup": "forearms"}'
    ```
 
+## Flow 3: Statistics & Progress Tracking
+
+**Goal**: Verify that a user can view their training statistics and exercise progression.
+
+1. **Get Summary**:
+
+   ```bash
+   curl -s -X GET "http://localhost:3000/statistics/summary" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+2. **Get Muscle Distribution with Date Filter**:
+
+   ```bash
+   curl -s -X GET "http://localhost:3000/statistics/muscle-distribution?startDate=2024-01-01&endDate=2024-12-31" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+3. **Get Exercise Progress**:
+
+   ```bash
+   # Use an exercise ID from previous steps
+   curl -s -X GET "http://localhost:3000/statistics/progress/$EX_ID" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+4. **Admin viewing User Stats**:
+   ```bash
+   USER_ID=$(curl -s -X GET "http://localhost:3000/users" -H "Authorization: Bearer $ADMIN_TOKEN" | jq -r '.data[0]._id')
+   curl -s -X GET "http://localhost:3000/statistics/summary/$USER_ID" \
+     -H "Authorization: Bearer $ADMIN_TOKEN" | jq .
+   ```
+
 ## Flow 3: Security & Ownership
 
 **Goal**: Verify that users cannot access or modify each other's data and that IDs are validated.
