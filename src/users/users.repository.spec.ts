@@ -38,6 +38,9 @@ describe('UsersRepository', () => {
     findByIdAndDelete: jest.fn().mockReturnValue({
       exec: jest.fn(),
     }),
+    countDocuments: jest.fn().mockReturnValue({
+      exec: jest.fn(),
+    }),
   };
 
   beforeEach(async () => {
@@ -90,12 +93,20 @@ describe('UsersRepository', () => {
   describe('findAll', () => {
     it('should return an array of users', async () => {
       const users = [mockUser];
+      const total = 1;
       mockUserModel.find.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(users),
+        skip: jest.fn().mockReturnValue({
+          limit: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(users),
+          }),
+        }),
+      } as any);
+      mockUserModel.countDocuments.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(total),
       } as any);
 
-      const result = await repository.findAll();
-      expect(result).toEqual(users);
+      const result = await repository.findAll({ page: 1, limit: 10 });
+      expect(result).toEqual({ data: users, total });
       expect(mockUserModel.find).toHaveBeenCalled();
     });
   });

@@ -5,6 +5,8 @@ import { WorkoutsController } from './workouts.controller';
 import { WorkoutsRepository } from './workouts.repository';
 import { Workout, WorkoutSchema } from './entities/workout.entity';
 import { CommonModule } from '../common/common.module';
+import { WorkoutOwnershipGuard } from '../auth/guards/workout-ownership.guard';
+import { ValidateObjectIdGuard } from '../auth/guards/validate-object-id.guard';
 
 @Module({
   imports: [
@@ -12,7 +14,12 @@ import { CommonModule } from '../common/common.module';
     CommonModule,
   ],
   controllers: [WorkoutsController],
-  providers: [WorkoutsService, WorkoutsRepository],
+  providers: [
+    WorkoutsService,
+    WorkoutsRepository,
+    WorkoutOwnershipGuard,
+    ValidateObjectIdGuard,
+  ],
   exports: [WorkoutsService],
 })
 export class WorkoutsModule {}

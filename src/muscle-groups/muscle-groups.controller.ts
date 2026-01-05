@@ -17,13 +17,13 @@ import {
   ApiExtraModels,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { MuscleGroupsService } from './muscle-groups.service';
 import { CreateMuscleGroupDto } from './dto/create-muscle-group.dto';
 import { UpdateMuscleGroupDto } from './dto/update-muscle-group.dto';
 import { MuscleGroupDto } from './dto/muscle-group.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { ValidateObjectIdGuard } from '../auth/guards/validate-object-id.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
@@ -75,16 +75,19 @@ export class MuscleGroupsController {
   }
 
   @Get(':id')
+  @UseGuards(ValidateObjectIdGuard)
   @ApiOperation({ summary: 'Get a muscle group by id' })
   @ApiResponse({ status: 200, type: MuscleGroupDto })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  findOne(@Param('id', ParseObjectIdPipe) id: string) {
+  findOne(@Param('id') id: string) {
     return this.muscleGroupsService.findOne(id);
   }
 
   @Patch(':id')
+  @UseGuards(ValidateObjectIdGuard)
   @ApiOperation({ summary: 'Update a muscle group' })
   @ApiResponse({ status: 200, type: MuscleGroupDto })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -92,19 +95,21 @@ export class MuscleGroupsController {
   @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   @ApiResponse({ status: 404, description: 'Not Found' })
   update(
-    @Param('id', ParseObjectIdPipe) id: string,
+    @Param('id') id: string,
     @Body() updateMuscleGroupDto: UpdateMuscleGroupDto,
   ) {
     return this.muscleGroupsService.update(id, updateMuscleGroupDto);
   }
 
   @Delete(':id')
+  @UseGuards(ValidateObjectIdGuard)
   @ApiOperation({ summary: 'Delete a muscle group' })
   @ApiResponse({ status: 200, type: MuscleGroupDto })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden (Admin only)' })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  remove(@Param('id', ParseObjectIdPipe) id: string) {
+  remove(@Param('id') id: string) {
     return this.muscleGroupsService.remove(id);
   }
 }

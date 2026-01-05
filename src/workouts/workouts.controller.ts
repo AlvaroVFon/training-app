@@ -17,13 +17,15 @@ import {
   ApiExtraModels,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { WorkoutsService } from './workouts.service';
 import { CreateWorkoutDto } from './dto/create-workout.dto';
 import { UpdateWorkoutDto } from './dto/update-workout.dto';
 import { WorkoutDto } from './dto/workout.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { WorkoutOwnershipGuard } from '../auth/guards/workout-ownership.guard';
+import { ValidateObjectIdGuard } from 'src/auth/guards/validate-object-id.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
+import { GetResource } from '../common/decorators/get-resource.decorator';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
@@ -74,25 +76,33 @@ export class WorkoutsController {
   }
 
   @Get(':id')
+  @UseGuards(ValidateObjectIdGuard, WorkoutOwnershipGuard)
   @ApiOperation({ summary: 'Get a workout by id' })
   @ApiResponse({ status: 200, type: WorkoutDto })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (No access to this workout)',
+  })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  findOne(
-    @Param('id', ParseObjectIdPipe) id: string,
-    @GetUser('id') userId: string,
-  ) {
-    return this.workoutsService.findOne(id, userId);
+  findOne(@GetResource('workout') workout: WorkoutDto) {
+    return workout;
   }
 
   @Patch(':id')
+  @UseGuards(ValidateObjectIdGuard, WorkoutOwnershipGuard)
   @ApiOperation({ summary: 'Update a workout' })
   @ApiResponse({ status: 200, type: WorkoutDto })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 400, description: 'Invalid ID format or bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (No access to this workout)',
+  })
   @ApiResponse({ status: 404, description: 'Not Found' })
   update(
-    @Param('id', ParseObjectIdPipe) id: string,
+    @Param('id') id: string,
     @Body() updateWorkoutDto: UpdateWorkoutDto,
     @GetUser('id') userId: string,
   ) {
@@ -100,14 +110,17 @@ export class WorkoutsController {
   }
 
   @Delete(':id')
+  @UseGuards(ValidateObjectIdGuard, WorkoutOwnershipGuard)
   @ApiOperation({ summary: 'Delete a workout' })
   @ApiResponse({ status: 200, type: WorkoutDto })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (No access to this workout)',
+  })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  remove(
-    @Param('id', ParseObjectIdPipe) id: string,
-    @GetUser('id') userId: string,
-  ) {
+  remove(@Param('id') id: string, @GetUser('id') userId: string) {
     return this.workoutsService.remove(id, userId);
   }
 }

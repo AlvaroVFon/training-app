@@ -55,12 +55,13 @@ export class WorkoutsRepository {
     return { data, total };
   }
 
-  async findOne(id: string, userId: string): Promise<Workout | null> {
+  async findOne(id: string, userId?: string): Promise<Workout | null> {
+    const filter: any = { _id: new Types.ObjectId(id) };
+    if (userId) {
+      filter.user = new Types.ObjectId(userId);
+    }
     return this.workoutModel
-      .findOne({
-        _id: new Types.ObjectId(id),
-        user: new Types.ObjectId(userId),
-      })
+      .findOne(filter)
       .populate('exercises.exercise')
       .exec();
   }

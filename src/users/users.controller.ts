@@ -17,12 +17,13 @@ import {
   ApiExtraModels,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserIsSelfGuard } from '../auth/guards/user-is-self.guard';
+import { ValidateObjectIdGuard } from '../auth/guards/validate-object-id.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
@@ -75,39 +76,40 @@ export class UsersController {
 
   @Get(':id')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ValidateObjectIdGuard, UserIsSelfGuard)
   @ApiOperation({ summary: 'Get a user by id' })
   @ApiResponse({ status: 200, description: 'Return the user', type: UserDto })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Only self or admin)' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  findOne(@Param('id', ParseObjectIdPipe) id: string) {
+  findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ValidateObjectIdGuard, UserIsSelfGuard)
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({
     status: 200,
     description: 'User updated successfully',
     type: UserDto,
   })
+  @ApiResponse({ status: 400, description: 'Invalid ID format or bad request' })
+  @ApiResponse({ status: 403, description: 'Forbidden (Only self or admin)' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  update(
-    @Param('id', ParseObjectIdPipe) id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ValidateObjectIdGuard)
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Delete a user (Admin only)' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Param('id', ParseObjectIdPipe) id: string) {
+  remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
 }

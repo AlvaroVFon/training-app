@@ -18,7 +18,11 @@ Training App is a comprehensive platform designed for registering and tracking p
 - **Framework**: NestJS (v11)
 - **Database**: MongoDB (Mongoose ODM)
 - **Authentication**: Passport.js (Local & JWT strategies)
-- **Authorization**: Role-Based Access Control (RBAC) with custom Guards.
+- **Authorization**: Role-Based Access Control (RBAC) and Resource Ownership validation.
+- **Security Patterns**:
+  - **Ownership Guards**: Custom guards (`WorkoutOwnershipGuard`, `ExerciseOwnershipGuard`, `UserIsSelfGuard`) ensure users only access their own data.
+  - **Request-level Caching**: Guards pre-load resources and attach them to the request object to optimize performance and avoid redundant database calls.
+  - **Centralized Validation**: `ValidateObjectIdGuard` ensures all resource IDs are valid MongoDB ObjectIds before reaching the business logic.
 - **Pagination**: Global offset-based pagination pattern (`page`, `limit`) managed by a centralized `PaginationService`.
 - **AI Integration**: (Planned) Python-based microservice or integrated TensorFlow/ONNX model.
 - **Documentation**: Swagger (OpenAPI)

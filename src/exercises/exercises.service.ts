@@ -62,13 +62,17 @@ export class ExercisesService {
     };
   }
 
-  async findOne(id: string, userId: string): Promise<Exercise> {
+  async findOne(id: string, userId?: string): Promise<Exercise> {
     const exercise = await this.repository.findById(id);
     if (!exercise) {
       throw new NotFoundException(`Exercise with id #${id} not found`);
     }
 
-    if (!exercise.isDefault && exercise.createdBy?.toString() !== userId) {
+    if (
+      userId &&
+      !exercise.isDefault &&
+      exercise.createdBy?.toString() !== userId
+    ) {
       throw new ForbiddenException('You do not have access to this exercise');
     }
 

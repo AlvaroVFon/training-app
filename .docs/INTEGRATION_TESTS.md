@@ -100,22 +100,33 @@ The API uses a centralized `PaginationService`. By default:
 
 ## Flow 3: Security & Ownership
 
-**Goal**: Verify that users cannot access or modify each other's data.
+**Goal**: Verify that users cannot access or modify each other's data and that IDs are validated.
 
-1. **Setup**: User A has a workout with ID `WORKOUT_ID`.
-2. **User B Login**:
+1. **Invalid ID Format**:
 
    ```bash
-   USER_B_TOKEN=$(curl -s -X POST http://localhost:3000/auth/login \
-     -H "Content-Type: application/json" \
-     -d '{"email":"user_flow_2@example.com", "password":"Password123!"}' | jq -r .access_token)
+   # Should return 400 Bad Request
+   curl -X GET http://localhost:3000/workouts/invalid-id -H "Authorization: Bearer $TOKEN"
    ```
 
-3. **Unauthorized Access**:
+2. **Unauthorized Profile Access**:
 
    ```bash
-   # Should return 404 Not Found (filtered by repository)
+   # Should return 403 Forbidden
+   curl -X GET http://localhost:3000/users/695a85b51d0a7a38e8192c44 -H "Authorization: Bearer $TOKEN"
+   ```
+
+3. **Unauthorized Workout Access**:
+
+   ```bash
+   # Should return 404 Not Found (filtered by repository for privacy)
    curl -X GET http://localhost:3000/workouts/$WORKOUT_ID -H "Authorization: Bearer $USER_B_TOKEN"
+   ```
+
+4. **Admin Override**:
+   ```bash
+   # Should return 200 OK (Admins can see everything)
+   curl -X GET http://localhost:3000/workouts/$WORKOUT_ID -H "Authorization: Bearer $ADMIN_TOKEN"
    ```
 
 ## Flow 4: Advanced Search & Filtering

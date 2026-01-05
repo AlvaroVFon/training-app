@@ -5,6 +5,7 @@ import { MuscleGroupsController } from './muscle-groups.controller';
 import { MuscleGroupsRepository } from './muscle-groups.repository';
 import { MuscleGroup, MuscleGroupSchema } from './entities/muscle-group.entity';
 import { CommonModule } from '../common/common.module';
+import { ValidateObjectIdGuard } from '../auth/guards/validate-object-id.guard';
 
 @Module({
   imports: [
@@ -14,7 +15,11 @@ import { CommonModule } from '../common/common.module';
     CommonModule,
   ],
   controllers: [MuscleGroupsController],
-  providers: [MuscleGroupsService, MuscleGroupsRepository],
+  providers: [
+    MuscleGroupsService,
+    MuscleGroupsRepository,
+    ValidateObjectIdGuard,
+  ],
   exports: [MuscleGroupsService],
 })
 export class MuscleGroupsModule {}

@@ -17,14 +17,16 @@ import {
   ApiExtraModels,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { ExerciseDto } from './dto/exercise.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ExerciseOwnershipGuard } from '../auth/guards/exercise-ownership.guard';
+import { ValidateObjectIdGuard } from '../auth/guards/validate-object-id.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
+import { GetResource } from '../common/decorators/get-resource.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { ExerciseQueryDto } from './dto/exercise-query.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
@@ -80,22 +82,22 @@ export class ExercisesController {
   }
 
   @Get(':id')
+  @UseGuards(ValidateObjectIdGuard, ExerciseOwnershipGuard)
   @ApiOperation({ summary: 'Get an exercise by id' })
   @ApiResponse({ status: 200, type: ExerciseDto })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({
     status: 403,
     description: 'Forbidden (No access to this exercise)',
   })
   @ApiResponse({ status: 404, description: 'Not Found' })
-  findOne(
-    @Param('id', ParseObjectIdPipe) id: string,
-    @GetUser('id') userId: string,
-  ) {
-    return this.exercisesService.findOne(id, userId);
+  findOne(@GetResource('exercise') exercise: ExerciseDto) {
+    return exercise;
   }
 
   @Patch(':id')
+  @UseGuards(ValidateObjectIdGuard, ExerciseOwnershipGuard)
   @ApiOperation({ summary: 'Update an exercise' })
   @ApiResponse({ status: 200, type: ExerciseDto })
   @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -106,7 +108,7 @@ export class ExercisesController {
   })
   @ApiResponse({ status: 404, description: 'Not Found' })
   update(
-    @Param('id', ParseObjectIdPipe) id: string,
+    @Param('id') id: string,
     @Body() updateExerciseDto: UpdateExerciseDto,
     @GetUser('id') userId: string,
     @GetUser('roles') roles: Role[],
@@ -115,8 +117,10 @@ export class ExercisesController {
   }
 
   @Delete(':id')
+  @UseGuards(ValidateObjectIdGuard, ExerciseOwnershipGuard)
   @ApiOperation({ summary: 'Delete an exercise' })
   @ApiResponse({ status: 200, type: ExerciseDto })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({
     status: 403,
@@ -124,7 +128,7 @@ export class ExercisesController {
   })
   @ApiResponse({ status: 404, description: 'Not Found' })
   remove(
-    @Param('id', ParseObjectIdPipe) id: string,
+    @Param('id') id: string,
     @GetUser('id') userId: string,
     @GetUser('roles') roles: Role[],
   ) {

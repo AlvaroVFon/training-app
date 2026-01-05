@@ -51,7 +51,7 @@ export class WorkoutsService {
     };
   }
 
-  async findOne(id: string, userId: string): Promise<WorkoutDto> {
+  async findOne(id: string, userId?: string): Promise<WorkoutDto> {
     const workout = await this.workoutsRepository.findOne(id, userId);
     if (!workout) {
       throw new NotFoundException(`Workout with ID ${id} not found`);
