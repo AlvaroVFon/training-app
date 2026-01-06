@@ -3,10 +3,12 @@ import { UsersService } from '../users/users.service';
 import { MuscleGroupsService } from '../muscle-groups/muscle-groups.service';
 import { ExercisesService } from '../exercises/exercises.service';
 import { WorkoutsService } from '../workouts/workouts.service';
+import { WorkoutSessionsService } from '../workout-sessions/workout-sessions.service';
 import { SEED_USERS } from './data/users.data';
 import { SEED_MUSCLE_GROUPS } from './data/muscle-groups.data';
 import { SEED_EXERCISES } from './data/exercises.data';
 import { SEED_WORKOUTS } from './data/workouts.data';
+import { SessionStatus } from '../workout-sessions/enums/session-status.enum';
 
 @Injectable()
 export class SeedService {
@@ -17,6 +19,7 @@ export class SeedService {
     private readonly muscleGroupsService: MuscleGroupsService,
     private readonly exercisesService: ExercisesService,
     private readonly workoutsService: WorkoutsService,
+    private readonly workoutSessionsService: WorkoutSessionsService,
   ) {}
 
   async runSeed() {
@@ -25,6 +28,7 @@ export class SeedService {
     await this.seedMuscleGroups();
     await this.seedExercises();
     await this.seedWorkouts();
+    await this.seedWorkoutSessions();
     this.logger.log('Seed process completed successfully.');
   }
 
@@ -70,18 +74,9 @@ export class SeedService {
 
   async seedExercises() {
     this.logger.log('Seeding exercises...');
-    let createdCount = 0;
-    const skippedCount = 0;
-
     for (const exerciseData of SEED_EXERCISES) {
-      const existing = await this.exercisesService.createDefault(exerciseData);
-      if (existing) {
-        // Since createDefault handles existence check, we just count
-        // This is a bit simplified, but works for seeding
-        createdCount++;
-      }
+      await this.exercisesService.createDefault(exerciseData);
     }
-
     this.logger.log(`Exercises: Seeding process finished.`);
   }
 
@@ -97,8 +92,10 @@ export class SeedService {
     }
 
     const targetUser = users[0];
+    const targetUserId = (targetUser as any)._id.toString();
+
     const { data: existingWorkouts } = await this.workoutsService.findAll(
-      (targetUser as any)._id.toString(),
+      targetUserId,
       { page: 1, limit: 10 },
     );
 
@@ -108,7 +105,7 @@ export class SeedService {
     }
 
     const { data: exercises } = await this.exercisesService.findAll(
-      (targetUser as any)._id.toString(),
+      targetUserId,
       { page: 1, limit: 100 },
     );
 
@@ -118,7 +115,7 @@ export class SeedService {
           const exercise = exercises.find((e) => e.name === ex.exerciseName);
           if (!exercise) return null;
           return {
-            exerciseId: (exercise as any)._id.toString(),
+            exerciseId: (exercise as any).id.toString(),
             sets: ex.sets,
           };
         })
@@ -131,11 +128,66 @@ export class SeedService {
             notes: workoutData.notes,
             exercises: mappedExercises as any,
           },
-          (targetUser as any)._id.toString(),
+          targetUserId,
         );
       }
     }
 
     this.logger.log('Workouts: Seeding process finished.');
+  }
+
+  async seedWorkoutSessions() {
+    this.logger.log('Seeding workout sessions...');
+    const { data: users } = await this.usersService.findAll({
+      page: 1,
+      limit: 10,
+    });
+    if (users.length === 0) return;
+
+    const targetUser = users[0];
+    const targetUserId = (targetUser as any)._id.toString();
+
+    const { data: existingSessions } =
+      await this.workoutSessionsService.findAll(targetUserId, {
+        page: 1,
+        limit: 10,
+      });
+
+    if (existingSessions.length > 0) {
+      this.logger.log('Workout sessions already seeded.');
+      return;
+    }
+
+    const { data: templates } = await this.workoutsService.findAll(
+      targetUserId,
+      { page: 1, limit: 10 },
+    );
+
+    for (const template of templates) {
+      const session = await this.workoutSessionsService.create(
+        {
+          name: `${template.name} Session`,
+          workoutTemplateId: template.id,
+          exercises: template.exercises.map((ex) => ({
+            exerciseId: ex.exerciseId,
+            sets: ex.sets.map((s) => ({
+              reps: s.reps,
+              weight: s.weight,
+              restTime: s.restTime,
+              notes: s.notes,
+            })),
+            notes: ex.notes,
+          })),
+        },
+        targetUserId,
+      );
+
+      // Close some sessions to have history
+      if (Math.random() > 0.3) {
+        await this.workoutSessionsService.close(session.id, targetUserId);
+      }
+    }
+
+    this.logger.log('Workout sessions: Seeding process finished.');
   }
 }

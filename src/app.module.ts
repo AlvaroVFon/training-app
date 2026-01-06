@@ -13,6 +13,7 @@ import { SeedModule } from './seed/seed.module';
 import { MuscleGroupsModule } from './muscle-groups/muscle-groups.module';
 import { ExercisesModule } from './exercises/exercises.module';
 import { WorkoutsModule } from './workouts/workouts.module';
+import { WorkoutSessionsModule } from './workout-sessions/workout-sessions.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { CommonModule } from './common/common.module';
 
@@ -40,6 +41,7 @@ import { CommonModule } from './common/common.module';
     MuscleGroupsModule,
     ExercisesModule,
     WorkoutsModule,
+    WorkoutSessionsModule,
     StatisticsModule,
   ],
   controllers: [AppController],

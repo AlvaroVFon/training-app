@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Workout } from '../workouts/entities/workout.entity';
+import { WorkoutSession } from '../workout-sessions/entities/workout-session.entity';
 import { Exercise } from '../exercises/entities/exercise.entity';
 import {
   StatisticsSummaryDto,
@@ -24,14 +24,15 @@ interface AggregationSummary {
 @Injectable()
 export class StatisticsRepository {
   constructor(
-    @InjectModel(Workout.name) private readonly workoutModel: Model<Workout>,
+    @InjectModel(WorkoutSession.name)
+    private readonly sessionModel: Model<WorkoutSession>,
     @InjectModel(Exercise.name) private readonly exerciseModel: Model<Exercise>,
   ) {}
 
   /**
    * Builds a MongoDB filter object for date ranges.
    * @param dateRange The date range DTO.
-   * @returns A filter object for the 'date' field.
+   * @returns A filter object for the 'startDate' field.
    */
   private buildDateFilter(dateRange: DateRangeDto): Record<string, any> {
     const filter: Record<string, any> = {};
@@ -43,13 +44,13 @@ export class StatisticsRepository {
       if (dateRange.endDate) {
         dateQuery.$lte = new Date(dateRange.endDate);
       }
-      filter.date = dateQuery;
+      filter.startDate = dateQuery;
     }
     return filter;
   }
 
   /**
-   * Aggregates workout data to provide a high-level summary.
+   * Aggregates workout session data to provide a high-level summary.
    * Uses a $facet pipeline to calculate overall totals and monthly counts in a single pass.
    */
   async getSummary(
@@ -61,7 +62,7 @@ export class StatisticsRepository {
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const dateFilter = this.buildDateFilter(dateRange);
 
-    const result = await this.workoutModel.aggregate<AggregationSummary>([
+    const result = await this.sessionModel.aggregate<AggregationSummary>([
       { $match: { user: userObjectId, ...dateFilter } },
       {
         $facet: {
@@ -92,7 +93,7 @@ export class StatisticsRepository {
             },
           ],
           thisMonth: [
-            { $match: { date: { $gte: firstDayOfMonth } } },
+            { $match: { startDate: { $gte: firstDayOfMonth } } },
             { $count: 'count' },
           ],
         },
@@ -125,7 +126,7 @@ export class StatisticsRepository {
     const userObjectId = new Types.ObjectId(userId);
     const dateFilter = this.buildDateFilter(dateRange);
 
-    const result = await this.workoutModel.aggregate<MuscleDistributionDto>([
+    const result = await this.sessionModel.aggregate<MuscleDistributionDto>([
       { $match: { user: userObjectId, ...dateFilter } },
       { $unwind: '$exercises' },
       {
@@ -178,7 +179,7 @@ export class StatisticsRepository {
     const exerciseObjectId = new Types.ObjectId(exerciseId);
     const dateFilter = this.buildDateFilter(dateRange);
 
-    const result = await this.workoutModel.aggregate<ExerciseProgressDto>([
+    const result = await this.sessionModel.aggregate<ExerciseProgressDto>([
       {
         $match: {
           user: userObjectId,
@@ -190,14 +191,14 @@ export class StatisticsRepository {
       { $match: { 'exercises.exercise': exerciseObjectId } },
       {
         $project: {
-          date: 1,
+          startDate: 1,
           sets: '$exercises.sets',
         },
       },
       { $unwind: '$sets' },
       {
         $group: {
-          _id: '$date',
+          _id: '$startDate',
           maxWeight: { $max: '$sets.weight' },
           volume: { $sum: { $multiply: ['$sets.weight', '$sets.reps'] } },
           // Epley Formula for 1RM: weight * (1 + reps/30)
