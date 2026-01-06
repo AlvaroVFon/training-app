@@ -16,57 +16,69 @@ The API uses a centralized `PaginationService`. By default:
 - **Max Limit**: 100 items.
 - **Normalization**: If a limit > 100 is requested, it will be capped at 100. If a page < 1 is requested, it will default to 1.
 
-## Flow 1: New User Onboarding & First Workout
+## Flow 1: Training Lifecycle (Template -> Session -> Stats)
 
-**Goal**: Verify that a new user can register, login, browse exercises, and record their first training session.
+**Goal**: Verify the complete flow from creating a blueprint to recording a session and seeing it reflected in statistics.
 
-1. **Register**:
+1. **Register & Login**:
 
    ```bash
-   curl -X POST http://localhost:3000/auth/register \
+   curl -s -X POST http://localhost:3000/auth/register \
      -H "Content-Type: application/json" \
-     -d '{"email":"newuser@example.com", "password":"Password123!", "name":"New User", "age": 25}'
-   ```
+     -d '{"email":"athlete@example.com", "password":"Password123!", "name":"Athlete", "age": 22}'
 
-2. **Login**:
-
-   ```bash
    TOKEN=$(curl -s -X POST http://localhost:3000/auth/login \
      -H "Content-Type: application/json" \
-     -d '{"email":"newuser@example.com", "password":"Password123!"}' | jq -r .access_token)
+     -d '{"email":"athlete@example.com", "password":"Password123!"}' | jq -r .access_token)
    ```
 
-3. **Browse Exercises**:
+2. **Create a Workout Template**:
 
    ```bash
-   curl -s -X GET "http://localhost:3000/exercises?page=1&limit=10" -H "Authorization: Bearer $TOKEN" | jq .
-   ```
+   # Get an exercise ID (e.g., Squats)
+   EX_ID=$(curl -s -X GET "http://localhost:3000/exercises?limit=100" -H "Authorization: Bearer $TOKEN" | jq -r '.data[] | select(.name=="Squats") | ._id')
 
-4. **Create Workout**:
-
-   ```bash
-   # Get an exercise ID (e.g., Push-ups) from the paginated data
-   EX_ID=$(curl -s -X GET "http://localhost:3000/exercises?limit=100" -H "Authorization: Bearer $TOKEN" | jq -r '.data[] | select(.name=="Push-ups") | ._id')
-
-   curl -X POST http://localhost:3000/workouts \
+   TMPL_ID=$(curl -s -X POST http://localhost:3000/workouts \
      -H "Authorization: Bearer $TOKEN" \
      -H "Content-Type: application/json" \
      -d "{
-       \"name\": \"Morning Routine\",
+       \"name\": \"Leg Day Template\",
+       \"exercises\": [{ \"exerciseId\": \"$EX_ID\", \"sets\": [{ \"reps\": 10, \"weight\": 0 }] }]
+     }" | jq -r .id)
+   ```
+
+3. **Start a Session from Template**:
+
+   ```bash
+   SESS_ID=$(curl -s -X POST http://localhost:3000/workout-sessions \
+     -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d "{
+       \"name\": \"Monday Morning Legs\",
+       \"workoutTemplateId\": \"$TMPL_ID\",
        \"exercises\": [
          {
            \"exerciseId\": \"$EX_ID\",
            \"sets\": [
-             { \"reps\": 20, \"weight\": 0, \"restTime\": 60 }
+             { \"reps\": 12, \"weight\": 60 },
+             { \"reps\": 10, \"weight\": 70 }
            ]
          }
        ]
-     }"
+     }" | jq -r .id)
    ```
 
-5. **View History**:
+4. **Close the Session**:
+
    ```bash
-   curl -s -X GET "http://localhost:3000/workouts?page=1&limit=5" -H "Authorization: Bearer $TOKEN" | jq .
+   curl -s -X POST "http://localhost:3000/workout-sessions/$SESS_ID/close" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+5. **View Statistics** (Only closed sessions are counted):
+   ```bash
+   curl -s -X GET "http://localhost:3000/statistics/summary" \
+     -H "Authorization: Bearer $TOKEN" | jq .
    ```
 
 ## Flow 2: Admin Management

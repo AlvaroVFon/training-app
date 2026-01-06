@@ -58,12 +58,20 @@ export class CreateWorkoutSessionDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: '507f1f77bcf86cd799439011', required: false })
+  @ApiProperty({
+    example: '507f1f77bcf86cd799439011',
+    required: false,
+    description: 'ID of the workout template to base this session on',
+  })
   @IsOptional()
   @IsMongoId()
   workoutTemplateId?: string;
 
-  @ApiProperty({ example: '2023-01-01T10:00:00Z', required: false })
+  @ApiProperty({
+    example: '2023-01-01T10:00:00Z',
+    required: false,
+    description: 'ISO 8601 date when the session started',
+  })
   @IsOptional()
   @IsDateString()
   startDate?: string;

@@ -28,7 +28,9 @@ export class StatisticsController {
   constructor(private readonly statisticsService: StatisticsService) {}
 
   @Get(['summary', 'summary/:userId'])
-  @ApiOperation({ summary: 'Get general training statistics summary' })
+  @ApiOperation({
+    summary: 'Get general training statistics summary (CLOSED sessions only)',
+  })
   @ApiParam({
     name: 'userId',
     required: false,
@@ -59,7 +61,9 @@ export class StatisticsController {
   }
 
   @Get(['muscle-distribution', 'muscle-distribution/:userId'])
-  @ApiOperation({ summary: 'Get distribution of sets per muscle group' })
+  @ApiOperation({
+    summary: 'Get distribution of sets per muscle group (CLOSED sessions only)',
+  })
   @ApiParam({
     name: 'userId',
     required: false,
@@ -91,7 +95,9 @@ export class StatisticsController {
 
   @Get(['progress/:exerciseId', 'progress/:exerciseId/:userId'])
   @UseGuards(ExerciseOwnershipGuard)
-  @ApiOperation({ summary: 'Get progression for a specific exercise' })
+  @ApiOperation({
+    summary: 'Get progression for a specific exercise (CLOSED sessions only)',
+  })
   @ApiParam({ name: 'exerciseId', required: true })
   @ApiParam({
     name: 'userId',

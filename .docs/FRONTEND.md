@@ -72,17 +72,26 @@ All list endpoints (`GET` requests returning arrays) follow a standard paginatio
 - `PATCH /exercises/:id`: Update an exercise (Users can update their own).
 - `DELETE /exercises/:id`: Remove an exercise (Users can delete their own).
 
-### Workouts
+### Workouts (Templates)
 
-- `GET /workouts`: Retrieve workout history for the current user.
-- `POST /workouts`: Register a new training session.
-- `GET /workouts/:id`: Get details of a specific workout.
-- `PATCH /workouts/:id`: Update a workout session.
-- `DELETE /workouts/:id`: Remove a workout from history.
+- `GET /workouts`: Retrieve workout templates for the current user.
+- `POST /workouts`: Create a new workout template (blueprint).
+- `GET /workouts/:id`: Get details of a specific template.
+- `PATCH /workouts/:id`: Update a template.
+- `DELETE /workouts/:id`: Remove a template.
+
+### Workout Sessions (Real Training)
+
+- `GET /workout-sessions`: Retrieve session history for the current user.
+- `POST /workout-sessions`: Start a new training session (Can be based on a `workoutTemplateId`).
+- `GET /workout-sessions/:id`: Get details of a specific session.
+- `PATCH /workout-sessions/:id`: Update an active session (Only if state is `OPEN`).
+- `DELETE /workout-sessions/:id`: Remove a session.
+- `POST /workout-sessions/:id/close`: Finalize a session. Once closed, it cannot be edited, and its data will be included in statistics.
 
 ### Statistics
 
-All statistics endpoints support optional date range filtering via query parameters: `startDate` and `endDate` (ISO 8601 format).
+All statistics endpoints aggregate data from **CLOSED** sessions and support optional date range filtering via query parameters: `startDate` and `endDate` (ISO 8601 format).
 
 - `GET /statistics/summary/:userId?`: Get general training summary (Total volume, reps, workouts).
 - `GET /statistics/muscle-distribution/:userId?`: Get distribution of sets per muscle group.

@@ -9,8 +9,9 @@ Training App is a comprehensive platform designed for registering and tracking p
 - **User Management**: Secure registration and authentication.
 - **Muscle Group Management**: CRUD operations for muscle groups (Admin only).
 - **Exercise Management**: System-wide default exercises and user-specific custom exercises.
-- **Workout Tracking**: Register exercises, sets, reps, and weights.
-- **Statistics & Progress**: Advanced data aggregation for training summaries, muscle distribution, and exercise progression with date range filtering.
+- **Workout Templates**: Create reusable training blueprints.
+- **Workout Sessions**: Register actual training sessions (OPEN/CLOSED states) based on templates or from scratch.
+- **Statistics & Progress**: Advanced data aggregation for training summaries, muscle distribution, and exercise progression based on **closed sessions** with date range filtering.
 - **AI Analysis**: Automated analysis of training sessions using machine learning models.
 - **Progress Monitoring**: Historical data and performance trends.
 
@@ -22,7 +23,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 - **Authentication**: Passport.js (Local & JWT strategies)
 - **Authorization**: Role-Based Access Control (RBAC) and Resource Ownership validation.
 - **Security Patterns**:
-  - **Ownership Guards**: Custom guards (`WorkoutOwnershipGuard`, `ExerciseOwnershipGuard`, `UserIsSelfGuard`) ensure users only access their own data.
+  - **Ownership Guards**: Custom guards (`WorkoutOwnershipGuard`, `WorkoutSessionOwnershipGuard`, `ExerciseOwnershipGuard`, `UserIsSelfGuard`) ensure users only access their own data.
   - **Request-level Caching**: Guards pre-load resources and attach them to the request object to optimize performance and avoid redundant database calls.
   - **Centralized Validation**: `ValidateObjectIdGuard` ensures all resource IDs are valid MongoDB ObjectIds before reaching the business logic.
 - **Pagination**: Global offset-based pagination pattern (`page`, `limit`) managed by a centralized `PaginationService`.
@@ -35,8 +36,9 @@ Training App is a comprehensive platform designed for registering and tracking p
 - `src/users`: User management (CRUD).
 - `src/muscle-groups`: Muscle group management (CRUD).
 - `src/exercises`: Exercise management (CRUD with ownership logic).
-- `src/workouts`: Workout tracking and history (User-specific CRUD).
-- `src/statistics`: Data aggregation and performance metrics.
+- `src/workouts`: Workout templates (reusable blueprints).
+- `src/workout-sessions`: Actual training session tracking (CLOSED/OPEN states).
+- `src/statistics`: Data aggregation based on closed sessions.
 - `src/tokens`: JWT generation and management.
 - `src/crypto`: Hashing and encryption services.
 - `src/config`: Environment configuration.

@@ -29,7 +29,7 @@ import { GetResource } from '../common/decorators/get-resource.decorator';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
 
-@ApiTags('workouts')
+@ApiTags('workouts (templates)')
 @ApiBearerAuth()
 @ApiExtraModels(PaginatedResponseDto, WorkoutDto)
 @UseGuards(JwtAuthGuard)
@@ -38,7 +38,7 @@ export class WorkoutsController {
   constructor(private readonly workoutsService: WorkoutsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new workout' })
+  @ApiOperation({ summary: 'Create a new workout template' })
   @ApiResponse({ status: 201, type: WorkoutDto })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -50,7 +50,9 @@ export class WorkoutsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all workouts for the current user' })
+  @ApiOperation({
+    summary: 'Get all workout templates for the current user',
+  })
   @ApiResponse({
     status: 200,
     schema: {
@@ -77,7 +79,7 @@ export class WorkoutsController {
 
   @Get(':id')
   @UseGuards(ValidateObjectIdGuard, WorkoutOwnershipGuard)
-  @ApiOperation({ summary: 'Get a workout by id' })
+  @ApiOperation({ summary: 'Get a workout template by id' })
   @ApiResponse({ status: 200, type: WorkoutDto })
   @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -92,7 +94,7 @@ export class WorkoutsController {
 
   @Patch(':id')
   @UseGuards(ValidateObjectIdGuard, WorkoutOwnershipGuard)
-  @ApiOperation({ summary: 'Update a workout' })
+  @ApiOperation({ summary: 'Update a workout template' })
   @ApiResponse({ status: 200, type: WorkoutDto })
   @ApiResponse({ status: 400, description: 'Invalid ID format or bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -111,7 +113,7 @@ export class WorkoutsController {
 
   @Delete(':id')
   @UseGuards(ValidateObjectIdGuard, WorkoutOwnershipGuard)
-  @ApiOperation({ summary: 'Delete a workout' })
+  @ApiOperation({ summary: 'Delete a workout template' })
   @ApiResponse({ status: 200, type: WorkoutDto })
   @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
