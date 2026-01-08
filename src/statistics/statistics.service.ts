@@ -6,6 +6,7 @@ import {
   ExerciseProgressDto,
 } from './dto/statistics-responses.dto';
 import { DateRangeDto } from './dto/date-range.dto';
+import { UserMetric } from './entities/user-metrics.entity';
 
 @Injectable()
 export class StatisticsService {
@@ -54,5 +55,19 @@ export class StatisticsService {
       exerciseId,
       dateRange,
     );
+  }
+
+  /**
+   * Retrieves user physical metrics history.
+   */
+  async getMetrics(userId: string, dateRange: DateRangeDto) {
+    return this.statisticsRepository.getUserMetrics(userId, dateRange);
+  }
+
+  /**
+   * Records a new physical metric for a user.
+   */
+  async addMetric(userId: string, metricData: Partial<UserMetric>) {
+    return this.statisticsRepository.createMetric(userId, metricData);
   }
 }

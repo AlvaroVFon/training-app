@@ -15,6 +15,8 @@ describe('StatisticsController', () => {
     getSummary: jest.fn(),
     getMuscleDistribution: jest.fn(),
     getExerciseProgress: jest.fn(),
+    getMetrics: jest.fn(),
+    addMetric: jest.fn(),
   };
 
   const mockGuard = {
@@ -104,6 +106,30 @@ describe('StatisticsController', () => {
         exerciseId,
         dateRange,
       );
+    });
+  });
+
+  describe('getMetrics', () => {
+    it('should call service.getMetrics', async () => {
+      const userId = 'user123';
+      const dateRange = {};
+      mockStatisticsService.getMetrics.mockResolvedValue([]);
+
+      await controller.getMetrics(userId, dateRange);
+
+      expect(service.getMetrics).toHaveBeenCalledWith(userId, dateRange);
+    });
+  });
+
+  describe('addMetric', () => {
+    it('should call service.addMetric', async () => {
+      const userId = 'user123';
+      const metricData = { weight: 80 };
+      mockStatisticsService.addMetric.mockResolvedValue({ id: '1' });
+
+      await controller.addMetric(userId, metricData);
+
+      expect(service.addMetric).toHaveBeenCalledWith(userId, metricData);
     });
   });
 });

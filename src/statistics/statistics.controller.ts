@@ -1,4 +1,12 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -6,6 +14,7 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
+  ApiExtraModels,
 } from '@nestjs/swagger';
 import { StatisticsService } from './statistics.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -18,7 +27,9 @@ import {
   MuscleDistributionDto,
   ExerciseProgressDto,
 } from './dto/statistics-responses.dto';
+import { UserMetricDto } from './dto/user-metric.dto';
 import { DateRangeDto } from './dto/date-range.dto';
+import { CreateUserMetricDto } from './dto/create-user-metric.dto';
 
 @ApiTags('statistics')
 @ApiBearerAuth()
@@ -128,5 +139,63 @@ export class StatisticsController {
       exerciseId,
       dateRange,
     );
+  }
+
+  @Post('metrics')
+  @ApiOperation({
+    summary: 'Record a new physical metric (weight, height, etc)',
+  })
+  @ApiResponse({ status: 201, type: UserMetricDto })
+  async addMetric(
+    @GetUser('id') loggedInUserId: string,
+    @Body() metricData: CreateUserMetricDto,
+  ) {
+    return this.statisticsService.addMetric(loggedInUserId, metricData);
+  }
+
+  @Post('metrics/:userId')
+  @ApiOperation({
+    summary: 'Record a new physical metric for another user (Admin only)',
+  })
+  @ApiParam({
+    name: 'userId',
+    required: true,
+    description: 'User ID',
+  })
+  @ApiResponse({ status: 201, type: UserMetricDto })
+  async addMetricForUser(
+    @Body() metricData: CreateUserMetricDto,
+    @Param('userId') userId: string,
+  ) {
+    return this.statisticsService.addMetric(userId, metricData);
+  }
+
+  @Get('metrics')
+  @ApiOperation({ summary: 'Get history of physical metrics' })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
+  @ApiResponse({ status: 200, type: [UserMetricDto] })
+  async getMetrics(
+    @GetUser('id') loggedInUserId: string,
+    @Query() dateRange: DateRangeDto,
+  ) {
+    return this.statisticsService.getMetrics(loggedInUserId, dateRange);
+  }
+
+  @Get('metrics/:userId')
+  @ApiOperation({ summary: 'Get history of physical metrics for another user' })
+  @ApiParam({
+    name: 'userId',
+    required: true,
+    description: 'User ID',
+  })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
+  @ApiResponse({ status: 200, type: [UserMetricDto] })
+  async getMetricsForUser(
+    @Query() dateRange: DateRangeDto,
+    @Param('userId') userId: string,
+  ) {
+    return this.statisticsService.getMetrics(userId, dateRange);
   }
 }

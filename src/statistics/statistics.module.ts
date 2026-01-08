@@ -12,12 +12,14 @@ import {
   ExerciseSchema,
 } from '../exercises/entities/exercise.entity';
 import { ExercisesModule } from '../exercises/exercises.module';
+import { UserMetric, UserMetricSchema } from './entities/user-metrics.entity';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: WorkoutSession.name, schema: WorkoutSessionSchema },
       { name: Exercise.name, schema: ExerciseSchema },
+      { name: UserMetric.name, schema: UserMetricSchema },
     ]),
     ExercisesModule,
   ],

@@ -12,6 +12,7 @@ Training App is a comprehensive platform designed for registering and tracking p
 - **Workout Templates**: Create reusable training blueprints.
 - **Workout Sessions**: Register actual training sessions (OPEN/CLOSED states) based on templates or from scratch.
 - **Statistics & Progress**: Advanced data aggregation for training summaries, muscle distribution, and exercise progression based on **closed sessions** with date range filtering.
+- **Physical Metrics Tracking**: Record and monitor physical progress including weight, height, and body fat percentage with historical tracking.
 - **AI Analysis**: Automated analysis of training sessions using machine learning models.
 - **Progress Monitoring**: Historical data and performance trends.
 
@@ -27,6 +28,7 @@ Training App is a comprehensive platform designed for registering and tracking p
   - **Request-level Caching**: Guards pre-load resources and attach them to the request object to optimize performance and avoid redundant database calls.
   - **Centralized Validation**: `ValidateObjectIdGuard` ensures all resource IDs are valid MongoDB ObjectIds before reaching the business logic.
 - **Pagination**: Global offset-based pagination pattern (`page`, `limit`) managed by a centralized `PaginationService`.
+- **Logging & Monitoring**: HTTP request/response logging using **Winston**. It automatically captures performance data (duration), user context, and provides detailed error tracing (payloads) in case of failure.
 - **AI Integration**: (Planned) Python-based microservice or integrated TensorFlow/ONNX model.
 - **Documentation**: Swagger (OpenAPI)
 

@@ -4,16 +4,31 @@ import { Types } from 'mongoose';
 import { StatisticsRepository } from './statistics.repository';
 import { WorkoutSession } from '../workout-sessions/entities/workout-session.entity';
 import { Exercise } from '../exercises/entities/exercise.entity';
+import { UserMetric } from './entities/user-metrics.entity';
 
 describe('StatisticsRepository', () => {
   let repository: StatisticsRepository;
   let sessionModel: any;
+  let userMetricModel: any;
 
   const mockSessionModel = {
     aggregate: jest.fn(),
   };
 
   const mockExerciseModel = {};
+
+  const mockUserMetricModel = {
+    find: jest.fn().mockReturnThis(),
+    sort: jest.fn().mockReturnThis(),
+    exec: jest.fn(),
+    save: jest.fn(),
+  };
+
+  // Helper factory to simulate Mongoose document instantiation
+  function MockMetricModel(dto: any) {
+    this.data = dto;
+    this.save = mockUserMetricModel.save;
+  }
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -28,11 +43,17 @@ describe('StatisticsRepository', () => {
           provide: getModelToken(Exercise.name),
           useValue: mockExerciseModel,
         },
+        {
+          provide: getModelToken(UserMetric.name),
+          // We use a combination of the constructor function and the mock object for find/exec
+          useValue: Object.assign(MockMetricModel, mockUserMetricModel),
+        },
       ],
     }).compile();
 
     repository = module.get<StatisticsRepository>(StatisticsRepository);
     sessionModel = module.get(getModelToken(WorkoutSession.name));
+    userMetricModel = module.get(getModelToken(UserMetric.name));
   });
 
   it('should be defined', () => {
@@ -115,6 +136,41 @@ describe('StatisticsRepository', () => {
         new Types.ObjectId(exerciseId),
       );
       expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe('getUserMetrics', () => {
+    it('should call find with correct filter and sorted by measuredAt', async () => {
+      const userId = new Types.ObjectId().toHexString();
+      const dateRange = { startDate: '2023-01-01', endDate: '2023-12-31' };
+      const mockResult = [{ weight: 80, measuredAt: new Date() }];
+      mockUserMetricModel.exec.mockResolvedValue(mockResult);
+
+      const result = await repository.getUserMetrics(userId, dateRange);
+
+      expect(userMetricModel.find).toHaveBeenCalledWith({
+        userId: new Types.ObjectId(userId),
+        measuredAt: {
+          $gte: expect.any(Date),
+          $lte: expect.any(Date),
+        },
+      });
+      expect(userMetricModel.sort).toHaveBeenCalledWith({ measuredAt: 1 });
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe('createMetric', () => {
+    it('should save a new metric', async () => {
+      const userId = new Types.ObjectId().toHexString();
+      const metricData = { weight: 80, height: 180 };
+      const savedMetric = { ...metricData, userId: new Types.ObjectId(userId) };
+      mockUserMetricModel.save.mockResolvedValue(savedMetric);
+
+      const result = await repository.createMetric(userId, metricData);
+
+      expect(mockUserMetricModel.save).toHaveBeenCalled();
+      expect(result).toEqual(savedMetric);
     });
   });
 });

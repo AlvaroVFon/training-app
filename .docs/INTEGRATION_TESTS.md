@@ -1,6 +1,6 @@
 # Integration Tests - User Flows
 
-This document describes the simulated user flows used to verify the integration of different modules (Auth, Users, Muscle Groups, Exercises, and Workouts).
+This document describes the simulated user flows used to verify the integration of different modules (Auth, Users, Muscle Groups, Exercises, Workouts, and Statistics/Metrics).
 
 ## Prerequisites
 
@@ -112,7 +112,7 @@ The API uses a centralized `PaginationService`. By default:
 
 ## Flow 3: Statistics & Progress Tracking
 
-**Goal**: Verify that a user can view their training statistics and exercise progression.
+**Goal**: Verify that a user can view their training statistics, exercise progression, and physical metrics.
 
 1. **Get Summary**:
 
@@ -136,14 +136,35 @@ The API uses a centralized `PaginationService`. By default:
      -H "Authorization: Bearer $TOKEN" | jq .
    ```
 
-4. **Admin viewing User Stats**:
+4. **Record Physical Metric (New)**:
+
+   ```bash
+   curl -s -X POST http://localhost:3000/statistics/metrics \
+     -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"weight": 82.5, "height": 180, "bodyFat": 14.2}' | jq .
+   ```
+
+5. **Get Metrics History**:
+
+   ```bash
+   curl -s -X GET "http://localhost:3000/statistics/metrics?startDate=2026-01-01" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+6. **Admin viewing User Stats & Metrics**:
+
    ```bash
    USER_ID=$(curl -s -X GET "http://localhost:3000/users" -H "Authorization: Bearer $ADMIN_TOKEN" | jq -r '.data[0]._id')
+   # Summary
    curl -s -X GET "http://localhost:3000/statistics/summary/$USER_ID" \
+     -H "Authorization: Bearer $ADMIN_TOKEN" | jq .
+   # Metrics
+   curl -s -X GET "http://localhost:3000/statistics/metrics/$USER_ID" \
      -H "Authorization: Bearer $ADMIN_TOKEN" | jq .
    ```
 
-## Flow 3: Security & Ownership
+## Flow 4: Security & Ownership
 
 **Goal**: Verify that users cannot access or modify each other's data and that IDs are validated.
 

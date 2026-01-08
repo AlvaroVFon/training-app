@@ -9,6 +9,7 @@ import {
   ExerciseProgressDto,
 } from './dto/statistics-responses.dto';
 import { DateRangeDto } from './dto/date-range.dto';
+import { UserMetric } from './entities/user-metrics.entity';
 
 interface AggregationSummary {
   totals: {
@@ -27,14 +28,20 @@ export class StatisticsRepository {
     @InjectModel(WorkoutSession.name)
     private readonly sessionModel: Model<WorkoutSession>,
     @InjectModel(Exercise.name) private readonly exerciseModel: Model<Exercise>,
+    @InjectModel(UserMetric.name)
+    private readonly userMetricModel: Model<UserMetric>,
   ) {}
 
   /**
    * Builds a MongoDB filter object for date ranges.
    * @param dateRange The date range DTO.
-   * @returns A filter object for the 'startDate' field.
+   * @param field The field to apply the filter to (default is 'startDate').
+   * @returns A filter object for the specified field.
    */
-  private buildDateFilter(dateRange: DateRangeDto): Record<string, any> {
+  private buildDateFilter(
+    dateRange: DateRangeDto,
+    field: string = 'startDate',
+  ): Record<string, any> {
     const filter: Record<string, any> = {};
     if (dateRange.startDate || dateRange.endDate) {
       const dateQuery: Record<string, Date> = {};
@@ -44,7 +51,7 @@ export class StatisticsRepository {
       if (dateRange.endDate) {
         dateQuery.$lte = new Date(dateRange.endDate);
       }
-      filter.startDate = dateQuery;
+      filter[field] = dateQuery;
     }
     return filter;
   }
@@ -225,5 +232,35 @@ export class StatisticsRepository {
     ]);
 
     return result;
+  }
+
+  /**
+   * Retrieves user metrics (weight, height, body fat) within a date range.
+   */
+  async getUserMetrics(
+    userId: string,
+    dateRange: DateRangeDto,
+  ): Promise<UserMetric[]> {
+    const userObjectId = new Types.ObjectId(userId);
+    const dateFilter = this.buildDateFilter(dateRange, 'measuredAt');
+
+    return this.userMetricModel
+      .find({ userId: userObjectId, ...dateFilter })
+      .sort({ measuredAt: 1 })
+      .exec();
+  }
+
+  /**
+   * Saves a new user metric.
+   */
+  async createMetric(
+    userId: string,
+    metricData: Partial<UserMetric>,
+  ): Promise<UserMetric> {
+    const newMetric = new this.userMetricModel({
+      ...metricData,
+      userId: new Types.ObjectId(userId),
+    });
+    return newMetric.save();
   }
 }

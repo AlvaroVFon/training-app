@@ -45,6 +45,7 @@ All list endpoints (`GET` requests returning arrays) follow a standard paginatio
 
 - `POST /auth/register`: Create a new account and get a JWT immediately.
 - `POST /auth/login`: Authenticate and get a JWT.
+- `GET /auth/profile`: Get current logged-in user details.
 
 ### Users
 
@@ -97,7 +98,15 @@ All statistics endpoints aggregate data from **CLOSED** sessions and support opt
 - `GET /statistics/muscle-distribution/:userId?`: Get distribution of sets per muscle group.
 - `GET /statistics/progress/:exerciseId/:userId?`: Get progression for a specific exercise (1RM, volume, max weight).
 
-_Note: Regular users can only access their own statistics. Admins can specify a `:userId` to view other users' data._
+### Physical Metrics
+
+Track physical progress over time.
+
+- `POST /statistics/metrics/:userId?`: Record a new physical metric (weight, height, body fat).
+- `GET /statistics/metrics/:userId?`: Get history of physical metrics with optional `startDate` and `endDate` filters.
+
+_Note: Regular users can only access their own statistics and metrics. Admins can specify a `:userId` to view other users' data._
+
 
 ### AI Analysis (Coming Soon)
 
