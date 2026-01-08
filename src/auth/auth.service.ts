@@ -8,6 +8,7 @@ import {
 } from './interfaces/auth-credentials.interface';
 import { User } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { toProfileDto } from '../users/users.helper';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,7 @@ export class AuthService {
     };
 
     return {
-      user,
+      user: toProfileDto(user as any),
       access_token: this.tokensService.generateToken(payload),
     };
   }

@@ -1,4 +1,4 @@
-import { User } from '../../users/entities/user.entity';
+import { ProfileDto } from '../dto/profile.dto';
 import { Role } from '../enums/role.enum';
 
 export interface LocalCredentials {
@@ -13,6 +13,6 @@ export interface JwtPayload {
 }
 
 export interface LoginResponse {
-  user: User;
+  user: ProfileDto;
   access_token: string;
 }
