@@ -31,7 +31,10 @@ export class UsersService {
     query: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<User>> {
     const pagination = this.paginationService.getPaginationParams(query);
-    const { data, total } = await this.usersRepository.findAll(pagination);
+    const { data, total } = await this.usersRepository.findAll({
+      ...query,
+      ...pagination,
+    });
 
     return {
       data,

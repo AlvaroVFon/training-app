@@ -78,7 +78,13 @@ describe('AuthService', () => {
 
       expect(usersService.create).toHaveBeenCalledWith(createUserDto);
       expect(result.access_token).toBe(token);
-      expect(result.user).toEqual(mockUser);
+      expect(result.user).toEqual({
+        id: mockUser._id,
+        email: mockUser.email,
+        name: mockUser.name,
+        age: mockUser.age,
+        roles: mockUser.roles,
+      });
     });
   });
 

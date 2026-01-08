@@ -30,12 +30,20 @@ export class MuscleGroupsRepository {
   async findAll(
     pagination: PaginationQueryDto,
   ): Promise<{ data: MuscleGroup[]; total: number }> {
-    const { page = 1, limit = 10 } = pagination;
+    const { page = 1, limit = 10, search } = pagination;
     const skip = (page - 1) * limit;
 
+    const filter: any = {};
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
     const [data, total] = await Promise.all([
-      this.muscleGroupModel.find().skip(skip).limit(limit).exec(),
-      this.muscleGroupModel.countDocuments().exec(),
+      this.muscleGroupModel.find(filter).skip(skip).limit(limit).exec(),
+      this.muscleGroupModel.countDocuments(filter).exec(),
     ]);
 
     return { data, total };

@@ -34,7 +34,10 @@ export class WorkoutSessionsService {
     query: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<WorkoutSessionDto>> {
     const pagination = this.paginationService.getPaginationParams(query);
-    const { data, total } = await this.repository.findAll(userId, pagination);
+    const { data, total } = await this.repository.findAll(userId, {
+      ...query,
+      ...pagination,
+    });
 
     return {
       data: data.map((s) => this.mapToDto(s)),

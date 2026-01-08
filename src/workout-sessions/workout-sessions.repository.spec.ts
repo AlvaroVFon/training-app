@@ -91,6 +91,34 @@ describe('WorkoutSessionsRepository', () => {
         user: new Types.ObjectId(userId),
       });
     });
+
+    it('should return filtered sessions when search is provided', async () => {
+      const userId = new Types.ObjectId().toHexString();
+      const sessions = [mockWorkoutSession];
+      const search = 'test';
+      const mockQuery = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(sessions),
+      };
+
+      model.find.mockReturnValue(mockQuery);
+      model.countDocuments.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(1),
+      });
+
+      await repository.findAll(userId, { page: 1, limit: 10, search });
+
+      expect(model.find).toHaveBeenCalledWith({
+        user: new Types.ObjectId(userId),
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { notes: { $regex: search, $options: 'i' } },
+        ],
+      });
+    });
   });
 
   describe('findOne', () => {

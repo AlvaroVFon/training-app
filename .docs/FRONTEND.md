@@ -19,13 +19,14 @@ From there, you can:
    `Authorization: Bearer <your_token>`
 4. **Roles**: The API uses Role-Based Access Control (RBAC). Some endpoints are restricted to `admin` users.
 
-## Pagination
+## Pagination & Search
 
-All list endpoints (`GET` requests returning arrays) follow a standard pagination pattern:
+All list endpoints (`GET` requests returning arrays) follow a standard pagination and search pattern:
 
 - **Query Parameters**:
   - `page`: The page number (default: `1`).
   - `limit`: Items per page (default: `10`, max: `100`).
+  - `search`: Global search term to filter results by name, description, email, or notes (case-insensitive).
 - **Response Structure**:
   ```json
   {
@@ -97,6 +98,11 @@ All statistics endpoints aggregate data from **CLOSED** sessions and support opt
 - `GET /statistics/summary/:userId?`: Get general training summary (Total volume, reps, workouts).
 - `GET /statistics/muscle-distribution/:userId?`: Get distribution of sets per muscle group.
 - `GET /statistics/progress/:exerciseId/:userId?`: Get progression for a specific exercise (1RM, volume, max weight).
+
+### Physical Metrics (Physical Tracking)
+
+- `GET /statistics/metrics/:userId?`: Get historical tracking of physical metrics (weight, height, body fat). Supports `startDate` and `endDate` filters.
+- `POST /statistics/metrics/:userId?`: Record a new set of physical metrics. Users can record their own; Admins can record for any user.
 
 ### Physical Metrics
 

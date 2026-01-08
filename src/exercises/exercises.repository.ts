@@ -38,15 +38,28 @@ export class ExercisesRepository {
     userId: string,
     query: ExerciseQueryDto,
   ): Promise<{ data: Exercise[]; total: number }> {
-    const { page = 1, limit = 10, muscleGroup } = query;
+    const { page = 1, limit = 10, muscleGroup, search } = query;
     const skip = (page - 1) * limit;
 
     const filter: any = {
-      $or: [{ isDefault: true }, { createdBy: new Types.ObjectId(userId) }],
+      $and: [
+        {
+          $or: [{ isDefault: true }, { createdBy: new Types.ObjectId(userId) }],
+        },
+      ],
     };
 
     if (muscleGroup) {
-      filter.muscleGroup = muscleGroup;
+      filter.$and.push({ muscleGroup });
+    }
+
+    if (search) {
+      filter.$and.push({
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+        ],
+      });
     }
 
     const [data, total] = await Promise.all([

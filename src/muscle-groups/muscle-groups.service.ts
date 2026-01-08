@@ -22,7 +22,10 @@ export class MuscleGroupsService {
     query: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<MuscleGroup>> {
     const pagination = this.paginationService.getPaginationParams(query);
-    const { data, total } = await this.repository.findAll(pagination);
+    const { data, total } = await this.repository.findAll({
+      ...query,
+      ...pagination,
+    });
 
     return {
       data,

@@ -107,7 +107,32 @@ describe('UsersRepository', () => {
 
       const result = await repository.findAll({ page: 1, limit: 10 });
       expect(result).toEqual({ data: users, total });
-      expect(mockUserModel.find).toHaveBeenCalled();
+      expect(mockUserModel.find).toHaveBeenCalledWith({});
+    });
+
+    it('should return filtered users when search is provided', async () => {
+      const users = [mockUser];
+      const total = 1;
+      const search = 'test';
+      mockUserModel.find.mockReturnValue({
+        skip: jest.fn().mockReturnValue({
+          limit: jest.fn().mockReturnValue({
+            exec: jest.fn().mockResolvedValue(users),
+          }),
+        }),
+      } as any);
+      mockUserModel.countDocuments.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(total),
+      } as any);
+
+      const result = await repository.findAll({ page: 1, limit: 10, search });
+      expect(result).toEqual({ data: users, total });
+      expect(mockUserModel.find).toHaveBeenCalledWith({
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+        ],
+      });
     });
   });
 

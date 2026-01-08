@@ -24,12 +24,20 @@ export class UsersRepository {
   async findAll(
     pagination: PaginationQueryDto,
   ): Promise<{ data: User[]; total: number }> {
-    const { page = 1, limit = 10 } = pagination;
+    const { page = 1, limit = 10, search } = pagination;
     const skip = (page - 1) * limit;
 
+    const filter: any = {};
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ];
+    }
+
     const [data, total] = await Promise.all([
-      this.userModel.find().skip(skip).limit(limit).exec(),
-      this.userModel.countDocuments().exec(),
+      this.userModel.find(filter).skip(skip).limit(limit).exec(),
+      this.userModel.countDocuments(filter).exec(),
     ]);
 
     return { data, total };

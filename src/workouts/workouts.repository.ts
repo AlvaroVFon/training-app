@@ -37,9 +37,17 @@ export class WorkoutsRepository {
     userId: string,
     pagination: PaginationQueryDto,
   ): Promise<{ data: Workout[]; total: number }> {
-    const { page = 1, limit = 10 } = pagination;
+    const { page = 1, limit = 10, search } = pagination;
     const skip = (page - 1) * limit;
-    const filter = { user: new Types.ObjectId(userId) };
+
+    const filter: any = { user: new Types.ObjectId(userId) };
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { notes: { $regex: search, $options: 'i' } },
+      ];
+    }
 
     const [data, total] = await Promise.all([
       this.workoutModel

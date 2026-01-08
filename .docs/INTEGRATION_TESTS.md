@@ -195,26 +195,47 @@ The API uses a centralized `PaginationService`. By default:
    curl -X GET http://localhost:3000/workouts/$WORKOUT_ID -H "Authorization: Bearer $ADMIN_TOKEN"
    ```
 
-## Flow 4: Advanced Search & Filtering
+## Flow 5: Advanced Search & Filtering
 
-**Goal**: Verify that exercises can be filtered by muscle group.
+**Goal**: Verify that resources can be filtered by specific fields and global search.
 
-1. **Filter by Chest**:
+1. **Filter Exercises by Muscle Group**:
 
    ```bash
    curl -s -X GET "http://localhost:3000/exercises?muscleGroup=chest" \
      -H "Authorization: Bearer $TOKEN" | jq .
    ```
 
-2. **Filter by Biceps**:
+2. **Global Search in Exercises** (Search by name or description):
 
    ```bash
-   curl -s -X GET "http://localhost:3000/exercises?muscleGroup=biceps" \
+   curl -s -X GET "http://localhost:3000/exercises?search=press" \
      -H "Authorization: Bearer $TOKEN" | jq .
    ```
 
-3. **Unauthorized Delete**:
+3. **Global Search in Workouts** (Search by name or notes):
+
    ```bash
-   # Should return 404 Not Found
-   curl -X DELETE http://localhost:3000/workouts/$WORKOUT_ID -H "Authorization: Bearer $USER_B_TOKEN"
+   curl -s -X GET "http://localhost:3000/workouts?search=heavy" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+4. **Global Search in Workout Sessions**:
+
+   ```bash
+   curl -s -X GET "http://localhost:3000/workout-sessions?search=morning" \
+     -H "Authorization: Bearer $TOKEN" | jq .
+   ```
+
+5. **Admin Search for Users** (Search by name or email):
+
+   ```bash
+   curl -s -X GET "http://localhost:3000/users?search=athlete" \
+     -H "Authorization: Bearer $ADMIN_TOKEN" | jq .
+   ```
+
+6. **Search Muscle Groups**:
+   ```bash
+   curl -s -X GET "http://localhost:3000/muscle-groups?search=back" \
+     -H "Authorization: Bearer $TOKEN" | jq .
    ```
