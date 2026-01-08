@@ -167,6 +167,23 @@ describe('UsersService', () => {
       expect(result).toEqual(updatedUser);
     });
 
+    it('should hash password when updating password', async () => {
+      const updateDto = { password: 'newPassword123' };
+      const hashedPass = 'newHashedPassword';
+      mockCryptoService.hashString.mockReturnValue(hashedPass);
+      mockUsersRepository.updateUser.mockResolvedValue({
+        ...mockUser,
+        password: hashedPass,
+      });
+
+      await service.update('1', updateDto);
+
+      expect(cryptoService.hashString).toHaveBeenCalledWith('newPassword123');
+      expect(repository.updateUser).toHaveBeenCalledWith('1', {
+        password: 'newHashedPassword',
+      });
+    });
+
     it('should throw NotFoundException if user to update not found', async () => {
       mockUsersRepository.updateUser.mockResolvedValue(null);
 

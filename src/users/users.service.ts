@@ -58,7 +58,15 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.usersRepository.updateUser(id, updateUserDto);
+    const dataToUpdate = { ...updateUserDto };
+
+    if (updateUserDto.password) {
+      dataToUpdate.password = this.cryptoService.hashString(
+        updateUserDto.password,
+      );
+    }
+
+    const user = await this.usersRepository.updateUser(id, dataToUpdate);
     if (!user) {
       throw new NotFoundException(`User with id #${id} not found`);
     }
