@@ -6,7 +6,9 @@ export class UserDto {
     example: '60d5ecb8b392d6622c8e4a1a',
     description: 'The unique identifier of the user',
   })
-  id: string;
+  id?: string;
+
+  _id?: any;
 
   @ApiProperty({
     example: 'user@example.com',

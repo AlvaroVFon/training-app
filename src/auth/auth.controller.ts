@@ -67,7 +67,6 @@ export class AuthController {
     type: ProfileDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  //...
   getProfile(@GetUser() user: User): ProfileDto {
     return toProfileDto(user);
   }
