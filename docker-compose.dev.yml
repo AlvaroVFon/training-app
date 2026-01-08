@@ -21,6 +21,23 @@ services:
       retries: 5
       start_period: 30s
 
+  redis:
+    image: redis:latest
+    container_name: training-app-redis-dev
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data_dev:/data
+    networks:
+      - training-app-network-dev
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   # NestJS Application - Development Mode
   app:
     build:
@@ -55,11 +72,15 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - training-app-network-dev
 
 volumes:
   mongodb_data_dev:
+    driver: local
+  redis_data_dev:
     driver: local
 
 networks:
